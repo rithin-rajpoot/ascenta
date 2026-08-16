@@ -1,0 +1,44 @@
+prd.md: 
+
+The PRD should never mention implementation details like Express, React, FastAPI, MongoDB, etc.
+A PRD is business + product focused, not technical. The tech stack belongs in ARCHITECTURE.md.
+------------------------------------------------------------------------------------------------
+Architecture.md: Unlike the PRD, this file is completely technical.
+------------------------------------------------------------------------------------------------
+PHASES.md:
+
+It includes:
+
+13 development phases, from project setup through deployment
+Clear objectives and completion criteria for every phase
+Frontend/backend/AI/database work where relevant
+The exact 3 MVP AI endpoints:
+/ai/project-blueprint
+/ai/documentation
+/ai/assistant
+Future AI endpoints clearly separated from MVP
+Team creation / joining / solo workflow
+Project Blueprint workflow
+Milestones + Kanban
+Faculty review
+Documentation
+Notifications
+Dashboards
+Integration/testing/security
+Deployment
+Tier 1–4 priority system in case time becomes limited
+A practical 30-day development schedule
+Future scope, including the Admin module only as a later addition
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------

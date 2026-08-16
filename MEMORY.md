@@ -1,0 +1,662 @@
+# Ascenta — Project Memory
+
+> **Purpose:** This file is the persistent working memory for AI coding agents working on Ascenta.
+>
+> **Important:** Update this file whenever meaningful implementation work is completed, an important architectural/design decision is made, or the current development task changes.
+
+---
+
+# 1. Project Identity
+
+**Project Name:** Ascenta
+
+**Project Type:** AI-assisted academic project lifecycle management platform
+
+**Primary Goal:**
+
+Help students take an academic project from idea → planning → development → review → documentation → completion through one unified platform.
+
+**Target Users:**
+
+- Students
+- Faculty
+
+**Admin:** Not included in the current MVP. It may be considered later if sufficient time remains.
+
+---
+
+# 2. Current Technology Stack
+
+## Frontend
+
+- React
+- Vite
+- Tailwind CSS
+- React Router
+- Axios
+- Lucide React
+
+## Backend
+
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT Authentication
+
+## AI Service
+
+- FastAPI
+- Gemini API
+
+## Database
+
+- MongoDB Atlas
+
+## Deployment — Planned
+
+- Frontend → Vercel
+- Node.js Backend → Render
+- FastAPI AI Service → Render
+- Database → MongoDB Atlas
+
+---
+
+# 3. Architecture Summary
+
+```text
+React + Vite
+     │
+     │ REST API
+     ▼
+Node.js + Express
+     │
+     ├──────────────► MongoDB Atlas
+     │
+     └──────────────► FastAPI AI Service
+                            │
+                            ▼
+                       Gemini API
+```
+
+The Node.js backend is responsible for normal application/business APIs.
+
+The FastAPI service is responsible for AI-related processing.
+
+The Gemini API key must remain inside the FastAPI service and must never be exposed to the frontend.
+
+---
+
+# 4. Current Development Status
+
+## Overall Status
+
+**Phase 0 — Project Foundation is complete.**
+
+The repository structure, frontend, backend, and AI service are all set up and verified working.
+
+## Current Phase
+
+**Phase 0 — Project Foundation (COMPLETED)**
+
+## Current Task
+
+Awaiting approval to begin Phase 1 — Authentication & User Management.
+
+---
+
+# 5. Documentation Status
+
+| File | Status | Purpose |
+|---|---|---|
+| `PRD.md` | Complete | Product requirements |
+| `ARCHITECTURE.md` | Complete | Application architecture |
+| `RULES.md` | Complete | AI/development rules |
+| `PHASES.md` | Complete | Development roadmap |
+| `DESIGN.md` | Complete | UI/UX and design system |
+| `MEMORY.md` | Active | Persistent development memory |
+
+---
+
+# 6. MVP Scope
+
+## Included
+
+### Authentication
+
+- Student registration
+- Student login
+- Faculty login
+- JWT authentication
+- Role-based authorization
+
+### Team Management
+
+- Create team
+- Invite members
+- Join team
+- Solo project
+
+### Project Management
+
+- Create project
+- Generate project ideas with AI
+- Use an existing project idea
+- Project workspace
+- Project overview
+- Features
+- Technologies
+- Difficulty
+- SDG mapping
+
+### AI Project Blueprint
+
+Initial AI endpoint:
+
+```text
+POST /ai/project-blueprint
+```
+
+The endpoint generates structured project information such as:
+
+- Project overview
+- Problem statement
+- Objectives
+- SDG mapping
+- Features
+- Technologies
+- Modules
+- Future scope
+
+### Milestones
+
+- Create milestone
+- Edit milestone
+- Delete milestone
+- Deadline
+- Status
+- Progress
+
+### Task Management
+
+Kanban board:
+
+```text
+Todo
+In Progress
+Review
+Completed
+```
+
+Tasks include:
+
+- Title
+- Description
+- Assignee
+- Priority
+- Due date
+- Status
+
+### Faculty Review
+
+- Faculty project access
+- Project progress view
+- Milestone/task visibility
+- Feedback
+- Feedback history
+
+### AI Technical Assistant
+
+Endpoint:
+
+```text
+POST /ai/assistant
+```
+
+Used for project-aware technical guidance.
+
+### AI Documentation
+
+Endpoint:
+
+```text
+POST /ai/documentation
+```
+
+Supported initial sections:
+
+- Abstract
+- Introduction
+- Problem Statement
+- Objectives
+- Scope
+- Methodology
+- Conclusion
+- Future Scope
+
+### Notifications
+
+Initial events:
+
+- Team invitation
+- Task assignment
+- Deadline reminder
+- Faculty feedback
+
+### Dashboard
+
+Student and faculty dashboards with basic project progress information.
+
+---
+
+# 7. Explicitly Excluded From MVP
+
+Do NOT implement these unless explicitly added later:
+
+- Admin portal
+- GitHub integration
+- Viva preparation
+- Mobile application
+- Advanced analytics
+- Calendar integration
+- Team chat
+- Industry mentor integration
+
+Future AI endpoints such as:
+
+```text
+POST /ai/project-ideas
+POST /ai/sdg-mapping
+POST /ai/feature-suggestions
+POST /ai/milestones
+```
+
+are not required initially.
+
+The MVP should avoid unnecessary AI micro-endpoints.
+
+---
+
+# 8. AI Endpoint Strategy
+
+The initial AI implementation should remain simple.
+
+## Current AI Endpoints
+
+```text
+POST /ai/project-blueprint
+POST /ai/assistant
+POST /ai/documentation
+```
+
+`/ai/project-blueprint` is the primary AI workflow and should generate the structured project blueprint.
+
+Do not split every AI feature into a separate endpoint unless there is a clear implementation need and sufficient time.
+
+---
+
+# 9. Development Priority
+
+## Tier 1 — Must Have
+
+1. Authentication
+2. Team management
+3. Project creation
+4. Project workspace
+5. AI project blueprint
+6. Milestones
+7. Kanban tasks
+8. Faculty review
+
+## Tier 2 — Core AI
+
+9. Technical assistant
+10. Documentation generator
+
+## Tier 3 — Supporting
+
+11. Notifications
+12. Dashboards
+13. Basic analytics
+
+## Tier 4 — Polish
+
+14. UI animations
+15. Advanced filters
+16. Advanced analytics
+17. Other optional improvements
+
+If time becomes limited, prioritize a complete Tier 1 + Tier 2 implementation over partially implemented optional features.
+
+---
+
+# 10. Current Database Entities
+
+Expected core entities:
+
+```text
+User
+Team
+Project
+Milestone
+Task
+FacultyReview
+Document
+Notification
+```
+
+Additional entities should only be introduced when required by an implemented feature.
+
+Avoid unnecessary database complexity.
+
+---
+
+# 11. Current API Strategy
+
+The API should be organized by domain.
+
+Example:
+
+```text
+/api/auth
+/api/users
+/api/teams
+/api/projects
+/api/milestones
+/api/tasks
+/api/reviews
+/api/documents
+/api/notifications
+/ai/*
+```
+
+Follow the existing architecture documentation before introducing new API patterns.
+
+Update `API.md` whenever API documentation is introduced or an endpoint changes.
+
+---
+
+# 12. Current Design Direction
+
+Ascenta uses a modern SaaS/productivity aesthetic.
+
+## Primary
+
+```text
+#6366F1
+```
+
+## Secondary
+
+```text
+#8B5CF6
+```
+
+## Font
+
+```text
+Inter
+```
+
+## Primary Theme
+
+Light theme.
+
+## UI Characteristics
+
+- Clean
+- Modern
+- Professional
+- Minimal
+- Student-friendly
+- Developer-oriented
+
+Follow `DESIGN.md` for detailed UI rules.
+
+---
+
+# 13. Important Product Decisions
+
+### Decision 1 — MERN + FastAPI
+
+The initial implementation uses MERN with FastAPI for AI rather than Spring Boot.
+
+Reason:
+
+Build the MVP faster using technologies already familiar to the developer.
+
+Spring Boot may be explored or used in a future rewrite, but it is not part of the current MVP implementation.
+
+### Decision 2 — No Admin Initially
+
+Admin functionality is intentionally excluded from the MVP.
+
+It may be added later if sufficient time remains.
+
+### Decision 3 — AI Is Assistive
+
+AI-generated content is a draft/recommendation.
+
+Users must be able to:
+
+- Review it
+- Edit it
+- Save it
+
+AI must not silently overwrite user data.
+
+### Decision 4 — Keep AI Architecture Simple
+
+Do not create a separate AI endpoint for every small AI capability.
+
+Use the three core AI endpoints unless a strong reason exists to expand them.
+
+### Decision 5 — Complete Core Workflow First
+
+A complete working project lifecycle is more important than having many partially implemented features.
+
+---
+
+# 14. Current Work Log
+
+## Initial State
+
+- Project concept finalized.
+- Project renamed to Ascenta.
+- MVP scope reduced to make the project achievable within approximately one month.
+- GitHub integration removed.
+- Viva preparation removed.
+- Admin module excluded from MVP.
+- MERN + FastAPI selected for initial implementation.
+- Project documentation structure established.
+
+## Phase 0 — Project Foundation (Completed)
+
+- Created monorepo-style structure: `client/`, `server/`, `ai-service/`, `docs/`.
+- Created root `.gitignore`, `.env.example`, and `README.md`.
+- Initialized Git repository.
+- Scaffolded React + Vite frontend with Tailwind CSS, React Router, Axios, and Lucide React.
+- Created frontend structure: `assets/`, `components/`, `layouts/`, `pages/`, `routes/`, `services/`, `hooks/`, `utils/`.
+- Created test pages (Home, About) proving React + Vite + Tailwind + React Router work.
+- Created Express backend with clean structure: `config/`, `controllers/`, `middleware/`, `models/`, `routes/`, `services/`, `utils/`.
+- Configured CORS using `FRONTEND_URL` environment variable.
+- Created MongoDB connection logic with clear failure diagnostics.
+- Created `/api/health` endpoint returning `{"success": true, "message": "Ascenta backend is running"}`.
+- Created FastAPI AI service with structure: `config/`, `routes/`, `schemas/`, `services/`.
+- Created `/health` endpoint returning `{"success": true, "message": "Ascenta AI service is running"}`.
+- Configured `GEMINI_API_KEY` environment variable in AI service.
+- Created `.env` files with dummy values for all three services.
+- Verified all three services run independently.
+- Verified security: `.env` files ignored, no secrets hardcoded.
+
+---
+
+# 15. Current Task
+
+**Phase 0 is complete. Awaiting approval to start Phase 1 — Authentication & User Management.**
+
+Next implementation tasks (Phase 1):
+
+1. Create User model.
+2. Implement student registration.
+3. Implement student login.
+4. Implement faculty login.
+5. Implement JWT authentication.
+6. Implement role-based authorization.
+7. Create frontend landing page.
+8. Create frontend login/registration pages.
+9. Create protected route handling.
+
+---
+
+# 16. Files Currently Being Worked On
+
+```text
+None currently — Phase 0 is complete.
+```
+
+When Phase 1 begins, update this section with the active files.
+
+Example:
+
+```text
+client/src/pages/auth/Login.jsx
+server/src/controllers/authController.js
+server/src/routes/authRoutes.js
+```
+
+---
+
+# 17. Known Issues
+
+```text
+None currently.
+```
+
+Record unresolved bugs or implementation problems here.
+
+Do not remove an issue until it has actually been resolved.
+
+---
+
+# 18. Important Decisions Log
+
+Use this format for future decisions:
+
+```text
+### YYYY-MM-DD — Decision Title
+
+Decision:
+What was decided.
+
+Reason:
+Why it was decided.
+
+Impact:
+What parts of the system are affected.
+```
+
+---
+
+# 19. Change Log
+
+Use this section for major completed changes.
+
+```text
+### 2026-08-16 — Phase 0: Project Foundation
+
+- Added: Monorepo structure (client/, server/, ai-service/, docs/).
+- Added: Root .gitignore, .env.example, README.md.
+- Added: React + Vite frontend with Tailwind, React Router, Axios, Lucide.
+- Added: Express backend with health endpoint and MongoDB connection.
+- Added: FastAPI AI service with health endpoint.
+- Added: Git repository initialized.
+- Added: .env files with dummy values for all services.
+- Verified: Frontend, backend, and AI service all run independently.
+- Verified: Security — .env ignored, no secrets hardcoded.
+```
+
+Keep entries concise.
+
+---
+
+# 20. AI Agent Instructions
+
+When an AI coding agent starts a task:
+
+1. Read `PRD.md`.
+2. Read `ARCHITECTURE.md`.
+3. Read `RULES.md`.
+4. Read `PHASES.md`.
+5. Read `DESIGN.md` for frontend work.
+6. Read this `MEMORY.md`.
+7. Check the current phase.
+8. Check the current task.
+9. Inspect existing code before creating new code.
+10. Reuse existing components and utilities.
+11. Do not assume a feature is missing before checking the repository.
+12. Do not modify unrelated modules.
+13. Test the implementation.
+14. Update this file after meaningful work.
+15. Record important architectural decisions.
+16. Record unresolved issues.
+17. Update the current task when moving to another task.
+
+---
+
+# 21. Memory Update Rule
+
+After completing a meaningful task, update:
+
+```text
+Current Development Status
+Current Phase
+Current Task
+Work Log
+Files Currently Being Worked On
+Known Issues
+Change Log
+```
+
+Do not rewrite the entire file unnecessarily.
+
+Keep historical decisions intact.
+
+---
+
+# 22. Definition of "Done"
+
+A feature should not be recorded as completed merely because code was written.
+
+A feature is considered complete when:
+
+- Implementation exists.
+- Frontend/backend integration works where applicable.
+- Database operations work where applicable.
+- Authentication/authorization is correct where applicable.
+- Error handling exists.
+- Basic testing has been performed.
+- The feature works in the intended user flow.
+- Relevant documentation has been updated.
+
+Only then should the feature be marked as completed in this memory file.
+
+---
+
+# 23. Future Scope Tracking
+
+Future ideas can be recorded here without becoming MVP requirements.
+
+```text
+- Admin portal
+- GitHub integration
+- Viva preparation
+- Mobile application
+- Advanced analytics
+- Calendar integration
+- Team chat
+- Industry mentor integration
+- Additional AI endpoints
+```
+
+Do not implement future-scope items unless the MVP is stable and there is sufficient time.

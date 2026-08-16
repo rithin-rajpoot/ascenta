@@ -34,6 +34,7 @@ Help students take an academic project from idea → planning → development �
 - Tailwind CSS
 - React Router
 - Axios
+- Redux Toolkit
 - Lucide React
 
 ## Backend
@@ -475,9 +476,10 @@ A complete working project lifecycle is more important than having many partiall
 - Created monorepo-style structure: `client/`, `server/`, `ai-service/`, `docs/`.
 - Created root `.gitignore`, `.env.example`, and `README.md`.
 - Initialized Git repository.
-- Scaffolded React + Vite frontend with Tailwind CSS, React Router, Axios, and Lucide React.
-- Created frontend structure: `assets/`, `components/`, `layouts/`, `pages/`, `routes/`, `services/`, `hooks/`, `utils/`.
+- Scaffolded React + Vite frontend with Tailwind CSS, React Router, Axios, Redux Toolkit, and Lucide React.
+- Created frontend structure: `assets/`, `components/`, `layouts/`, `pages/`, `routes/`, `services/`, `hooks/`, `utils/`, `store/`.
 - Created test pages (Home, About) proving React + Vite + Tailwind + React Router work.
+- Created Redux store (`client/src/store/index.js`) and wired `Provider` into `main.jsx`.
 - Created Express backend with clean structure: `config/`, `controllers/`, `middleware/`, `models/`, `routes/`, `services/`, `utils/`.
 - Configured CORS using `FRONTEND_URL` environment variable.
 - Created MongoDB connection logic with clear failure diagnostics.
@@ -486,8 +488,11 @@ A complete working project lifecycle is more important than having many partiall
 - Created `/health` endpoint returning `{"success": true, "message": "Ascenta AI service is running"}`.
 - Configured `GEMINI_API_KEY` environment variable in AI service.
 - Created `.env` files with dummy values for all three services.
+- Installed `@reduxjs/toolkit` and `react-redux` in client.
 - Verified all three services run independently.
+- Verified frontend production build succeeds with Redux wired in.
 - Verified security: `.env` files ignored, no secrets hardcoded.
+- Pushed first commit to GitHub (`main` branch) at `git@github.com:rithin-rajpoot/ascenta.git`.
 
 ---
 
@@ -541,6 +546,20 @@ Do not remove an issue until it has actually been resolved.
 
 # 18. Important Decisions Log
 
+### 2026-08-16 — Redux Toolkit for Frontend State Management
+
+Decision:
+Redux Toolkit (@reduxjs/toolkit + react-redux) is the state management library for the frontend.
+
+Reason:
+The application will share significant global state (authentication, current project, team data) across many pages/sections, and the project explicitly requires Redux Toolkit.
+
+Impact:
+- Frontend stack updated in ARCHITECTURE.md, RULES.md, PHASES.md, MEMORY.md, README.md.
+- RULES.md previously discouraged Redux; it now mandates Redux Toolkit and forbids alternative state management libraries.
+- Phase 0 now includes Redux Toolkit configuration alongside React Router.
+- client/package.json will include `@reduxjs/toolkit` and `react-redux`.
+
 Use this format for future decisions:
 
 ```text
@@ -567,7 +586,7 @@ Use this section for major completed changes.
 
 - Added: Monorepo structure (client/, server/, ai-service/, docs/).
 - Added: Root .gitignore, .env.example, README.md.
-- Added: React + Vite frontend with Tailwind, React Router, Axios, Lucide.
+- Added: React + Vite frontend with Tailwind, React Router, Axios, Redux Toolkit, Lucide.
 - Added: Express backend with health endpoint and MongoDB connection.
 - Added: FastAPI AI service with health endpoint.
 - Added: Git repository initialized.

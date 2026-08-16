@@ -62,6 +62,7 @@ Database
 - Tailwind CSS
 - React Router
 - Axios
+- Redux Toolkit
 - React Hook Form
 - React Hot Toast
 - Recharts

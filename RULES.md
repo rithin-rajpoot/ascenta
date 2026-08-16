@@ -142,8 +142,10 @@ Do not create admin pages, routes, controllers, models, or UI unless explicitly 
 - Validate forms before submission and also validate them on the backend.
 - Make all important pages responsive.
 - Maintain consistent spacing, typography, buttons, cards, forms, and colors according to `DESIGN.md`.
-- Avoid unnecessarily complex global state management.
-- Do not introduce Redux unless the project actually requires it.
+- Use Redux Toolkit for global state management.
+- Keep global state minimal and focused.
+- Prefer local component state for UI-only concerns that do not need to be shared.
+- Do not introduce an alternative state management library unless explicitly approved.
 - Avoid deeply nested components when a simpler structure is possible.
 
 ---
@@ -827,6 +829,7 @@ A complete working core is more important than partially implemented advanced fe
 Ascenta will initially be developed using:
 
 - React
+- Redux Toolkit
 - Node.js
 - Express.js
 - MongoDB

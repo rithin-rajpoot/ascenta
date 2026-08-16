@@ -10,7 +10,7 @@ Ascenta helps students take an academic project from idea → planning → devel
 
 | Layer | Technology |
 |---|---|
-| Frontend | React, Vite, Tailwind CSS, React Router, Axios, Lucide React |
+| Frontend | React, Vite, Tailwind CSS, React Router, Axios, Redux Toolkit, Lucide React |
 | Backend | Node.js, Express.js, MongoDB, Mongoose |
 | AI Service | Python, FastAPI, Google Gemini API |
 | Database | MongoDB Atlas |

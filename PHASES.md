@@ -44,6 +44,7 @@ Set up the complete development environment and repository structure.
 - Initialize React + Vite.
 - Configure Tailwind CSS.
 - Configure React Router.
+- Configure Redux Toolkit (state management).
 - Create basic application structure.
 - Create reusable UI foundation.
 

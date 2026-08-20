@@ -125,6 +125,7 @@ Health check: `GET http://localhost:8000/health`
 ## Phase Status
 
 - **Phase 0 — Project Foundation:** Completed
-- **Phase 1 — Authentication & User Management:** Pending
+- **Phase 1 — Authentication & User Management:** Completed
+- **Phase 2 — Team Management:** Pending
 
 See `PHASES.md` for the full development roadmap.

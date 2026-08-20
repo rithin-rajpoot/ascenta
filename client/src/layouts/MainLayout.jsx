@@ -1,5 +1,7 @@
-import { NavLink, Outlet } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { LogOut, Sparkles, User as UserIcon } from "lucide-react";
+import { logout } from "../store/slices/authSlice";
 
 const navLinkClass = ({ isActive }) =>
   `rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
@@ -9,6 +11,15 @@ const navLinkClass = ({ isActive }) =>
   }`;
 
 function MainLayout() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/");
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-surface">
@@ -27,6 +38,38 @@ function MainLayout() {
             <NavLink to="/about" className={navLinkClass}>
               About
             </NavLink>
+
+            {user ? (
+              <>
+                <NavLink to="/profile" className={navLinkClass}>
+                  <span className="flex items-center gap-1.5">
+                    <UserIcon size={14} />
+                    {user.name.split(" ")[0]}
+                  </span>
+                </NavLink>
+                <button
+                  onClick={handleLogout}
+                  className="ml-1 rounded-lg px-3 py-2 text-sm font-medium text-text-secondary transition-colors hover:bg-error-light hover:text-error"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <LogOut size={14} />
+                    Logout
+                  </span>
+                </button>
+              </>
+            ) : (
+              <>
+                <NavLink to="/login" className={navLinkClass}>
+                  Login
+                </NavLink>
+                <NavLink
+                  to="/register"
+                  className="ml-1 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-dark"
+                >
+                  Register
+                </NavLink>
+              </>
+            )}
           </nav>
         </div>
       </header>

@@ -92,17 +92,17 @@ The Gemini API key must remain inside the FastAPI service and must never be expo
 
 ## Overall Status
 
-**Phase 0 — Project Foundation is complete.**
+**Phase 1 — Authentication & User Management is complete.**
 
-The repository structure, frontend, backend, and AI service are all set up and verified working.
+Student registration, login, logout, profile, JWT authentication, and role-based authorization are implemented and verified.
 
 ## Current Phase
 
-**Phase 0 — Project Foundation (COMPLETED)**
+**Phase 1 — Authentication & User Management (COMPLETED)**
 
 ## Current Task
 
-Awaiting approval to begin Phase 1 — Authentication & User Management.
+Awaiting approval to begin Phase 2 — Team Management.
 
 ---
 
@@ -481,7 +481,7 @@ A complete working project lifecycle is more important than having many partiall
 - Created test pages (Home, About) proving React + Vite + Tailwind + React Router work.
 - Created Redux store (`client/src/store/index.js`) and wired `Provider` into `main.jsx`.
 - Created Express backend with clean structure: `config/`, `controllers/`, `middleware/`, `models/`, `routes/`, `services/`, `utils/`.
-- Configured CORS using `FRONTEND_URL` environment variable.
+- Installed `bcryptjs` and `jsonwebtoken` in server.
 - Created MongoDB connection logic with clear failure diagnostics.
 - Created `/api/health` endpoint returning `{"success": true, "message": "Ascenta backend is running"}`.
 - Created FastAPI AI service with structure: `config/`, `routes/`, `schemas/`, `services/`.
@@ -494,23 +494,44 @@ A complete working project lifecycle is more important than having many partiall
 - Verified security: `.env` files ignored, no secrets hardcoded.
 - Pushed first commit to GitHub (`main` branch) at `git@github.com:rithin-rajpoot/ascenta.git`.
 
+## Phase 1 — Authentication & User Management (Completed)
+
+- Created `User` model with name, email, password (hashed via bcrypt), and role (student/faculty).
+- Created `generateToken` JWT utility.
+- Created `authMiddleware` with `protect` (JWT verification) and `authorize` (role-based) middleware.
+- Created `authService` with `registerStudent`, `loginUser`, and `getProfile`.
+- Created `authController` with `register`, `login`, and `profile` handlers.
+- Created `authRoutes` with `POST /api/auth/register`, `POST /api/auth/login`, and `GET /api/auth/profile` (protected).
+- Wired auth routes into `app.js`.
+- Updated `errorMiddleware` to surface handled error messages.
+- Created frontend `authService` API client.
+- Updated `api.js` with JWT token interceptor.
+- Created `authSlice` Redux slice with `registerUser`, `loginUser`, `logout`, and `clearError`.
+- Registered auth reducer in the Redux store.
+- Created `ProtectedRoute` component for route protection.
+- Created `AuthLayout` for login/register pages.
+- Created `LoginPage`, `RegisterPage`, and `ProfilePage`.
+- Updated routes with `/login`, `/register`, and protected `/profile`.
+- Updated `MainLayout` with auth-aware navigation (Login/Register when logged out; Profile/Logout when logged in).
+- Verified frontend production build succeeds.
+- Verified full auth flow end-to-end: register → login → protected profile.
+
 ---
 
 # 15. Current Task
 
-**Phase 0 is complete. Awaiting approval to start Phase 1 — Authentication & User Management.**
+**Phase 1 is complete. Awaiting approval to start Phase 2 — Team Management.**
 
-Next implementation tasks (Phase 1):
+Next implementation tasks (Phase 2):
 
-1. Create User model.
-2. Implement student registration.
-3. Implement student login.
-4. Implement faculty login.
-5. Implement JWT authentication.
-6. Implement role-based authorization.
-7. Create frontend landing page.
-8. Create frontend login/registration pages.
-9. Create protected route handling.
+1. Create Team model.
+2. Implement create team.
+3. Implement join team.
+4. Implement invite members.
+5. Implement view team members.
+6. Implement team leader identification.
+7. Implement team member management.
+8. Implement solo project option.
 
 ---
 
@@ -593,6 +614,16 @@ Use this section for major completed changes.
 - Added: .env files with dummy values for all services.
 - Verified: Frontend, backend, and AI service all run independently.
 - Verified: Security — .env ignored, no secrets hardcoded.
+
+### 2026-08-20 — Phase 1: Authentication & User Management
+
+- Added: User model with bcrypt password hashing.
+- Added: JWT authentication (generateToken, protect middleware).
+- Added: Role-based authorization (authorize middleware).
+- Added: Auth routes, controller, and service.
+- Added: Frontend login, register, and profile pages.
+- Added: Redux auth slice and ProtectedRoute.
+- Verified: Register, login, and protected profile endpoints work end-to-end.
 ```
 
 Keep entries concise.

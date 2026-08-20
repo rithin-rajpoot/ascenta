@@ -7,8 +7,11 @@ export const notFound = (req, res, next) => {
 
 export const errorHandler = (err, req, res, next) => {
   console.error("❌ Error:", err.message);
-  res.status(err.status || 500).json({
+
+  const status = err.status || 500;
+
+  res.status(status).json({
     success: false,
-    message: "Internal server error",
+    message: status === 500 ? "Internal server error" : err.message,
   });
 };

@@ -92,17 +92,17 @@ The Gemini API key must remain inside the FastAPI service and must never be expo
 
 ## Overall Status
 
-**Phase 1 — Authentication & User Management is complete.**
+**Phase 2 — Team Management is complete.**
 
-Student registration, login, logout, profile, JWT authentication, and role-based authorization are implemented and verified.
+Team creation, joining, member invitation, member removal, team leader permissions, and role-based authorization are implemented and verified.
 
 ## Current Phase
 
-**Phase 1 — Authentication & User Management (COMPLETED)**
+**Phase 2 — Team Management (COMPLETED)**
 
 ## Current Task
 
-Awaiting approval to begin Phase 2 — Team Management.
+Awaiting approval to begin Phase 3 — Project Creation & Project Workspace.
 
 ---
 
@@ -516,39 +516,34 @@ A complete working project lifecycle is more important than having many partiall
 - Verified frontend production build succeeds.
 - Verified full auth flow end-to-end: register → login → protected profile.
 
+## Phase 2 — Team Management (Completed)
+
+- Created `Team` model with name, leader, and members (Mongoose references).
+- Created `teamService` with createTeam, getTeam, inviteMember, joinTeam, removeMember.
+- Created `teamController` with create, get, invite, join, remove handlers.
+- Created `teamRoutes` with POST /api/teams, GET /api/teams/:id, POST /api/teams/:id/invite, POST /api/teams/:id/join, DELETE /api/teams/:id/members/:userId.
+- Wired team routes into `app.js` (all protected by `protect` middleware).
+- Created frontend `teamService` API client.
+- Created `teamSlice` Redux slice with createTeam, getTeam, inviteMember, joinTeam, removeMember, clearTeam, clearError.
+- Registered team reducer in the Redux store.
+- Created `TeamSetupPage` (Create/Join/Solo selection).
+- Created `CreateTeamPage`, `JoinTeamPage`, and `TeamDetailsPage`.
+- Added protected routes: /team/setup, /team/create, /team/join, /team/:id.
+- Verified frontend production build succeeds.
+- Verified all team APIs end-to-end: create, get, invite, join, remove, with proper authorization.
+
 ---
 
 # 15. Current Task
 
-**Phase 1 is complete. Awaiting approval to start Phase 2 — Team Management.**
-
-Next implementation tasks (Phase 2):
-
-1. Create Team model.
-2. Implement create team.
-3. Implement join team.
-4. Implement invite members.
-5. Implement view team members.
-6. Implement team leader identification.
-7. Implement team member management.
-8. Implement solo project option.
+**Phase 2 is complete. Awaiting approval to start Phase 3 — Project Creation & Project Workspace.**
 
 ---
 
 # 16. Files Currently Being Worked On
 
 ```text
-None currently — Phase 0 is complete.
-```
-
-When Phase 1 begins, update this section with the active files.
-
-Example:
-
-```text
-client/src/pages/auth/Login.jsx
-server/src/controllers/authController.js
-server/src/routes/authRoutes.js
+None currently — Phase 2 is complete.
 ```
 
 ---
@@ -624,6 +619,21 @@ Use this section for major completed changes.
 - Added: Frontend login, register, and profile pages.
 - Added: Redux auth slice and ProtectedRoute.
 - Verified: Register, login, and protected profile endpoints work end-to-end.
+
+### 2026-08-25 — Phase 2: Team Management
+
+- Added: Team model with name, leader, and members.
+- Added: Team service, controller, and routes.
+- Added: Frontend team service, Redux team slice, and team pages.
+- Verified: Create, get, invite, join, and remove team APIs work end-to-end.
+- Verified: Authorization (leader-only actions, no-token 401, non-leader 403).
+
+### 2026-08-25 — Phase 2: Team Management UI Completion
+
+- Added: `getUserTeams` API endpoint to fetch a user's teams.
+- Added: Frontend `MyTeamsPage` dashboard.
+- Added: "Teams" navigation link in `MainLayout`.
+- Verified: Dashboard correctly displays existing teams and prompts for team creation if empty.
 ```
 
 Keep entries concise.

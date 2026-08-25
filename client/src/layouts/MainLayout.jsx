@@ -41,6 +41,11 @@ function MainLayout() {
 
             {user ? (
               <>
+                {user.role === "student" && (
+                  <NavLink to="/teams" className={navLinkClass}>
+                    Teams
+                  </NavLink>
+                )}
                 <NavLink to="/profile" className={navLinkClass}>
                   <span className="flex items-center gap-1.5">
                     <UserIcon size={14} />

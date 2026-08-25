@@ -126,6 +126,7 @@ Health check: `GET http://localhost:8000/health`
 
 - **Phase 0 — Project Foundation:** Completed
 - **Phase 1 — Authentication & User Management:** Completed
-- **Phase 2 — Team Management:** Pending
+- **Phase 2 — Team Management:** Completed
+- **Phase 3 — Project Creation & Project Workspace:** Pending
 
 See `PHASES.md` for the full development roadmap.

@@ -7,6 +7,11 @@ import AboutPage from "../pages/AboutPage";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import ProfilePage from "../pages/ProfilePage";
+import TeamSetupPage from "../pages/team/TeamSetupPage";
+import CreateTeamPage from "../pages/team/CreateTeamPage";
+import JoinTeamPage from "../pages/team/JoinTeamPage";
+import TeamDetailsPage from "../pages/team/TeamDetailsPage";
+import MyTeamsPage from "../pages/team/MyTeamsPage";
 
 function AppRoutes() {
   return (
@@ -19,6 +24,46 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/team/setup"
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <TeamSetupPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teams"
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <MyTeamsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/team/create"
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <CreateTeamPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/team/join"
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <JoinTeamPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/team/:id"
+          element={
+            <ProtectedRoute>
+              <TeamDetailsPage />
             </ProtectedRoute>
           }
         />

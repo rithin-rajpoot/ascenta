@@ -151,6 +151,14 @@ Health check: `GET http://localhost:8000/health`
 - Project overview page (title, domain, technologies, objectives, scope, target users, methodology, expected outcome, future scope, features, SDGs)
 - Authorization — only owners/team members can access their projects
 
+### AI Project Blueprint Generator (Phase 4)
+- Dedicated `POST /api/ai/project-blueprint` endpoint (proxied to the FastAPI AI service)
+- Accepts project idea, domain, technologies, difficulty, team size, and preferred SDGs
+- AI generates a structured blueprint: problem statement, objectives, scope, features, target users, SDG mapping, methodology, expected outcome, future scope
+- Editable blueprint form — students remain in control of AI-generated content
+- Blueprint validation/normalization server-side before saving (AI output cannot corrupt stored data)
+- Graceful AI/API failure handling
+
 ---
 
 ## Phase Status
@@ -159,5 +167,6 @@ Health check: `GET http://localhost:8000/health`
 - **Phase 1 — Authentication & User Management:** Completed
 - **Phase 2 — Team Management:** Completed
 - **Phase 3 — Project Creation & AI Blueprint:** Completed
+- **Phase 4 — AI Project Blueprint Generator:** Completed
 
 See `PHASES.md` for the full development roadmap.

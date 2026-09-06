@@ -42,6 +42,9 @@ class ProjectBlueprintRequest(BaseModel):
     domain: Optional[str] = None
     technologies: Optional[str] = None
     difficulty: Optional[str] = None
+    teamSize: Optional[int] = None
+    # Preferred SDG goal names the AI should align the blueprint with.
+    sdgs: Optional[List[str]] = None
 
 class ProjectBlueprintResponse(BaseModel):
     title: str

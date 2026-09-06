@@ -92,17 +92,17 @@ The Gemini API key must remain inside the FastAPI service and must never be expo
 
 ## Overall Status
 
-**Phase 3 — Project Creation & AI Project Blueprint is complete.**
+**Phase 4 — AI Project Blueprint Generator is complete.**
 
-Project creation, AI idea generation, feature suggestion, SDG mapping, and blueprint generation are implemented and verified. The user can create solo or team projects from their team dashboard and view the project overview. Phase 3 has been refined further with team-scoped projects, an enhanced project overview, and hardened project authorization.
+The AI Project Blueprint Generator is implemented and verified. The dedicated `POST /api/ai/project-blueprint` endpoint accepts project idea, domain, technologies, difficulty, team size, and preferred SDGs, and the AI produces a structured blueprint that the student can review, edit, and save. Server-side normalization validates blueprint data before it is written to the database, and AI/API failures are handled gracefully.
 
 ## Current Phase
 
-**Phase 3 — Project Creation & AI Project Blueprint (COMPLETED, refinements staged)**
+**Phase 4 — AI Project Blueprint Generator (COMPLETED)**
 
 ## Current Task
 
-Phase 3 work (team invite codes, team-scoped projects, project overview enhancements, hardened project authorization) is complete and ready to commit/push. Phase 4 — AI Project Blueprint Generator has not yet started.
+Phase 4 — AI Project Blueprint Generator is complete and ready to commit/push. Phase 5 — Milestone Planning has not yet started.
 
 ---
 
@@ -708,6 +708,13 @@ Use this section for major completed changes.
 - Improved: Team Details member management UX (confirm before remove, loading/success/error states, member count, stale-team clear on navigation).
 - Improved: `ProjectBlueprintPage` guards string/null array fields; AI proxy request/response logging; Gemini prompts forced to respond only in English.
 - Verified: Frontend production build succeeds; server `node --check` passes on all modified files.
+### 2026-09-06 — Phase 4: AI Project Blueprint Generator
+
+- Enriched: FastAPI `ProjectBlueprintRequest` now accepts `teamSize` and `sdgs` (preferred SDG goal names); `generate_blueprint` includes them in the Gemini prompt so the AI aligns the SDG mapping with the student's choices.
+- Added: `server/src/utils/normalizeProjectData.js` — server-side blueprint validation/normalization (coerces comma-separated string-list fields to arrays, normalizes `features` and `sdgs`, drops empty entries) applied in `createProject` and `updateProject` so malformed AI/client output cannot corrupt saved projects.
+- Updated: `ProjectBlueprintPage` passes the currently mapped SDG goals into the full blueprint generation call.
+- Documented: Phase 4 output uses the `Project`-model schema (scope/targetUsers/methodology/expectedOutcome) rather than the earlier sketch's `modules` field, for consistency with the model and Phase 3 UI.
+- Verified: Frontend production build succeeds; server `node --check` passes on all modified files; AI service imports and schemas compile.
 ```
 
 Keep entries concise.

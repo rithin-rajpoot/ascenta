@@ -88,6 +88,8 @@ function ProjectBlueprintPage() {
         domain: formData.domain,
         technologies: formData.technologies,
         difficulty: formData.difficulty,
+        // Pass currently mapped SDGs so the AI keeps blueprint and SDG mapping aligned.
+        sdgs: (formData.sdgs || []).map((sdg) => sdg.goal).filter(Boolean),
       });
 
       console.log("[Blueprint] Full response:", JSON.stringify(res));

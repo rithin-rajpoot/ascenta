@@ -72,6 +72,12 @@ class GeminiService:
 
     def generate_blueprint(self, data: dict) -> dict:
         from app.schemas.ai import ProjectBlueprintResponse
+        provided_sdgs = data.get("sdgs") or []
+        if isinstance(provided_sdgs, list):
+            provided_sdgs = [str(s).strip() for s in provided_sdgs if str(s).strip()]
+        sdgs_text = ", ".join(provided_sdgs) if provided_sdgs else "Any"
+        team_size = data.get("teamSize")
+        team_size_text = team_size if team_size else "Not specified"
         prompt = f"""
         Generate a structured academic project blueprint for the following project:
         Title: {data.get('title')}
@@ -79,7 +85,9 @@ class GeminiService:
         Domain: {data.get('domain', 'Any')}
         Technologies: {data.get('technologies', 'Any')}
         Difficulty: {data.get('difficulty', 'Any')}
-        
+        Team Size: {team_size_text}
+        Preferred SDGs (align the blueprint and the SDG mapping with these, if provided): {sdgs_text}
+
         Provide a comprehensive overview including problem statement, objectives, scope, features, target users, domain, technologies, SDGs, methodology, expected outcome, and future scope.
         IMPORTANT: Respond ONLY in English.
         """

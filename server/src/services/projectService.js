@@ -1,5 +1,6 @@
 import Project from "../models/Project.js";
 import Team from "../models/Team.js";
+import normalizeProjectData from "../utils/normalizeProjectData.js";
 
 export const createProject = async (data) => {
   if (data.team) {
@@ -11,7 +12,7 @@ export const createProject = async (data) => {
     }
   }
 
-  const project = await Project.create(data);
+  const project = await Project.create(normalizeProjectData(data));
   return project;
 };
 
@@ -33,7 +34,7 @@ export const getProjectsByTeam = async (teamId) => {
 };
 
 export const updateProject = async (projectId, data) => {
-  const project = await Project.findByIdAndUpdate(projectId, data, {
+  const project = await Project.findByIdAndUpdate(projectId, normalizeProjectData(data), {
     new: true,
     runValidators: true,
   }).populate("owner", "name email").populate("team", "name");

@@ -347,6 +347,17 @@ Save
 - Student can save the finalized blueprint.
 - AI/API failure is handled gracefully.
 
+> **Implementation note:** The generated blueprint follows the `Project` model schema
+> (`problemStatement`, `objectives`, `scope`, `features`, `targetUsers`, `domain`,
+> `technologies`, `sdgs`, `methodology`, `expectedOutcome`, `futureScope`) rather than the
+> earlier sketch's `modules` field, so it stays consistent with the Project model and the
+> Phase 3 blueprint UI. This avoids a schema migration for a field that milestone planning
+> (Phase 5) already covers.
+
+## Status
+
+**COMPLETED**
+
 ---
 
 # Phase 5 — Milestone Planning

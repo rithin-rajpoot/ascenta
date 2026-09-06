@@ -159,6 +159,13 @@ Health check: `GET http://localhost:8000/health`
 - Blueprint validation/normalization server-side before saving (AI output cannot corrupt stored data)
 - Graceful AI/API failure handling
 
+### Milestone Planning (Phase 5)
+- Create, edit, and delete milestones
+- Set deadlines and mark milestone status (Pending / In Progress / Completed)
+- Milestone progress is shown as a progress bar in the project workspace and on the milestone page
+- Leader/owner-managed milestone planning, viewable by all project members
+- Milestones are exposed as nested project routes (`/api/projects/:projectId/milestones`)
+
 ---
 
 ## Phase Status
@@ -168,5 +175,6 @@ Health check: `GET http://localhost:8000/health`
 - **Phase 2 — Team Management:** Completed
 - **Phase 3 — Project Creation & AI Blueprint:** Completed
 - **Phase 4 — AI Project Blueprint Generator:** Completed
+- **Phase 5 — Milestone Planning:** Completed
 
 See `PHASES.md` for the full development roadmap.

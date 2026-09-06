@@ -409,6 +409,15 @@ Create:
 - Students can view milestone status.
 - Milestone progress is reflected in the project workspace.
 
+> **Implementation note:** Milestone mutations are restricted to the project owner or team
+> leader (see `RULES.md`), while project members can view milestones and progress. Milestones
+> are exposed as nested project routes under `POST/GET /api/projects/:projectId/milestones`.
+> No separate AI milestone endpoint is used — the regular backend manages milestone data.
+
+## Status
+
+**COMPLETED**
+
 ---
 
 # Phase 6 — Task Management / Kanban Board

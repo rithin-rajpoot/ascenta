@@ -92,17 +92,17 @@ The Gemini API key must remain inside the FastAPI service and must never be expo
 
 ## Overall Status
 
-**Phase 4 — AI Project Blueprint Generator is complete.**
+**Phase 5 — Milestone Planning is complete.**
 
-The AI Project Blueprint Generator is implemented and verified. The dedicated `POST /api/ai/project-blueprint` endpoint accepts project idea, domain, technologies, difficulty, team size, and preferred SDGs, and the AI produces a structured blueprint that the student can review, edit, and save. Server-side normalization validates blueprint data before it is written to the database, and AI/API failures are handled gracefully.
+Students can convert their project blueprint into an actionable development plan. Milestones support create/edit/delete, deadlines, and status tracking (Pending / In Progress / Completed). Milestone progress is reflected in the project workspace and on a dedicated milestone page. Mutations are restricted to the project owner or team leader, while all project members can view milestones and progress.
 
 ## Current Phase
 
-**Phase 4 — AI Project Blueprint Generator (COMPLETED)**
+**Phase 5 — Milestone Planning (COMPLETED)**
 
 ## Current Task
 
-Phase 4 — AI Project Blueprint Generator is complete and ready to commit/push. Phase 5 — Milestone Planning has not yet started.
+Phase 5 — Milestone Planning is complete and ready to commit/push. Phase 6 — Task Management / Kanban Board has not yet started.
 
 ---
 
@@ -715,6 +715,16 @@ Use this section for major completed changes.
 - Updated: `ProjectBlueprintPage` passes the currently mapped SDG goals into the full blueprint generation call.
 - Documented: Phase 4 output uses the `Project`-model schema (scope/targetUsers/methodology/expectedOutcome) rather than the earlier sketch's `modules` field, for consistency with the model and Phase 3 UI.
 - Verified: Frontend production build succeeds; server `node --check` passes on all modified files; AI service imports and schemas compile.
+### 2026-09-06 — Phase 5: Milestone Planning
+
+- Added: `Milestone` model (title, description, project, deadline, status, order, createdBy).
+- Added: `milestoneService`, `milestoneController`, and nested `milestoneRoutes` exposed under `/api/projects/:projectId/milestones` (GET list, POST create, PUT update, DELETE).
+- Added: Shared `utils/projectAccess.js` with `isProjectMember` (view) and `isProjectManager` (mutate) helpers; extracted/refactored the private authorization helper from `projectController` for reuse. Milestone create/edit/delete require owner or team leader; members can view.
+- Added: `ProjectMilestonesPage` (route `/project/:id/milestones`) with progress bar, add/edit/delete, deadline, and status tracking; manager-gated mutations and member read-only view.
+- Added: Milestone progress card + "Manage" link on `ProjectOverviewPage` so progress is reflected in the project workspace.
+- Added: Milestone API/service functions and `projectSlice` thunks/reducers (`getMilestones`, `createMilestone`, `updateMilestone`, `deleteMilestone`).
+- Updated: `projectService.getProjectById` populates the team `leader` so the frontend can compute manager state.
+- Verified: Server app imports and HTTP route registration confirmed; frontend production build succeeds; server `node --check` passes on all modified files.
 ```
 
 Keep entries concise.

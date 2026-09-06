@@ -16,6 +16,7 @@ import ProjectSetupPage from "../pages/project/ProjectSetupPage";
 import ProjectIdeasPage from "../pages/project/ProjectIdeasPage";
 import ProjectBlueprintPage from "../pages/project/ProjectBlueprintPage";
 import ProjectOverviewPage from "../pages/project/ProjectOverviewPage";
+import ProjectMilestonesPage from "../pages/project/ProjectMilestonesPage";
 
 function AppRoutes() {
   return (
@@ -100,6 +101,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute roles={["student"]}>
               <ProjectOverviewPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/project/:id/milestones"
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <ProjectMilestonesPage />
             </ProtectedRoute>
           }
         />

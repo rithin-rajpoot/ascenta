@@ -1,17 +1,18 @@
 import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
-import { getProject } from "../../store/slices/projectSlice";
+import { Loader2, ArrowLeft, CheckCircle2, Milestone as MilestoneIcon, ArrowRight } from "lucide-react";
+import { getProject, getMilestones } from "../../store/slices/projectSlice";
 
 function ProjectOverviewPage() {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { currentProject, isLoading, error } = useSelector((state) => state.project);
+  const { currentProject, milestones, isLoading, error } = useSelector((state) => state.project);
 
   useEffect(() => {
     if (id) {
       dispatch(getProject(id));
+      dispatch(getMilestones(id));
     }
   }, [dispatch, id]);
 
@@ -59,6 +60,38 @@ function ProjectOverviewPage() {
             </div>
             <h1 className="text-3xl font-bold text-text-primary mb-4">{currentProject.title}</h1>
             <p className="text-text-secondary leading-relaxed">{currentProject.description}</p>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <h2 className="flex items-center gap-2 text-lg font-bold text-text-primary">
+                <MilestoneIcon size={20} className="text-primary" />
+                Milestones
+              </h2>
+              <Link
+                to={`/project/${id}/milestones`}
+                className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-dark"
+              >
+                Manage <ArrowRight size={15} />
+              </Link>
+            </div>
+            {(() => {
+              const done = milestones.filter((m) => m.status === "Completed").length;
+              const pct = milestones.length ? Math.round((done / milestones.length) * 100) : 0;
+              return (
+                <div className="mt-4">
+                  <p className="text-sm text-text-secondary">
+                    {done} of {milestones.length} milestones completed
+                  </p>
+                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-background">
+                    <div
+                      className="h-full rounded-full bg-success transition-all duration-300"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
           <div className="rounded-2xl border border-border bg-surface p-8 shadow-sm">

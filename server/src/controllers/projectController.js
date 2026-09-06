@@ -1,27 +1,6 @@
 import * as projectService from "../services/projectService.js";
 import Team from "../models/Team.js";
-
-// Helper to check authorization
-const authorizeProjectAccess = async (project, userId) => {
-  const userIdStr = String(userId);
-
-  if (project.owner && String(project.owner._id) === userIdStr) {
-    return true;
-  }
-
-  if (project.team) {
-    const team = await Team.findById(project.team._id || project.team);
-    if (team) {
-      const isLeader = String(team.leader) === userIdStr;
-      const isMember = team.members.some((m) => String(m) === userIdStr);
-      if (isLeader || isMember) {
-        return true;
-      }
-    }
-  }
-
-  return false;
-};
+import { isProjectMember } from "../utils/projectAccess.js";
 
 export const createProjectController = async (req, res, next) => {
   try {
@@ -74,7 +53,7 @@ export const getProjectController = async (req, res, next) => {
     const project = await projectService.getProjectById(req.params.id);
     
     // Check authorization
-    const isAuthorized = await authorizeProjectAccess(project, req.user._id);
+    const isAuthorized = await isProjectMember(project, req.user._id);
     if (!isAuthorized) {
       return res.status(403).json({ success: false, message: "Not authorized to access this project" });
     }
@@ -90,7 +69,7 @@ export const updateProjectController = async (req, res, next) => {
     const existingProject = await projectService.getProjectById(req.params.id);
     
     // Check authorization
-    const isAuthorized = await authorizeProjectAccess(existingProject, req.user._id);
+    const isAuthorized = await isProjectMember(existingProject, req.user._id);
     if (!isAuthorized) {
       return res.status(403).json({ success: false, message: "Not authorized to modify this project" });
     }

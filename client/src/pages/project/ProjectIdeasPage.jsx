@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Sparkles, ArrowLeft, Loader2, Lightbulb } from "lucide-react";
 import { generateProjectIdeas } from "../../services/aiService";
 
 function ProjectIdeasPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const teamId = location.state?.teamId || null;
   const [formData, setFormData] = useState({
     domain: "",
     technologies: "",
@@ -35,13 +37,15 @@ function ProjectIdeasPage() {
 
   const handleSelectIdea = (idea) => {
     // Pass the selected idea to the blueprint page
-    navigate("/project/blueprint", { state: { initialIdea: idea, preferences: formData } });
+    navigate("/project/blueprint", {
+      state: { initialIdea: idea, preferences: formData, teamId },
+    });
   };
 
   return (
     <div className="mx-auto max-w-4xl">
       <Link
-        to="/project/setup"
+        to={{ pathname: "/project/setup", state: teamId ? { teamId } : undefined }}
         className="inline-flex items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-text-primary"
       >
         <ArrowLeft size={16} />

@@ -20,6 +20,13 @@ const teamSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    inviteCode: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      uppercase: true,
+    },
   },
   {
     timestamps: true,

@@ -3,6 +3,7 @@ import {
   getTeam,
   inviteMember,
   joinTeam,
+  joinTeamByCode,
   removeMember,
   getUserTeams,
 } from "../services/teamService.js";
@@ -69,6 +70,27 @@ export const joinTeamController = async (req, res, next) => {
   try {
     const team = await joinTeam({
       teamId: req.params.id,
+      userId: req.user._id,
+    });
+    res.status(200).json({ success: true, message: "Joined team", team });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const joinTeamByCodeController = async (req, res, next) => {
+  try {
+    const { inviteCode } = req.body;
+
+    if (!inviteCode || !inviteCode.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Invite code is required",
+      });
+    }
+
+    const team = await joinTeamByCode({
+      inviteCode,
       userId: req.user._id,
     });
     res.status(200).json({ success: true, message: "Joined team", team });

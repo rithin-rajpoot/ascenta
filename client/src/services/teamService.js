@@ -20,6 +20,11 @@ export const joinTeam = async (teamId) => {
   return data;
 };
 
+export const joinTeamByCode = async (inviteCode) => {
+  const { data } = await api.post("/teams/join/by-code", { inviteCode });
+  return data;
+};
+
 export const removeMember = async (teamId, userId) => {
   const { data } = await api.delete(`/teams/${teamId}/members/${userId}`);
   return data;

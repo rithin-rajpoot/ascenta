@@ -372,19 +372,16 @@ Authenticated Requests
 
 ```
 Student
-
-↓
-
+  |
+  ↓
 Choose
 
-Create Team
-
-Join Team
-
-Solo Project
-
-↓
-
+Create Team   OR   Join Team (via invite code, e.g. ASC-XXXXXX)   OR   Solo Project
+  |
+  ↓
+Share invite code with peers
+  |
+  ↓
 Project Workspace
 ```
 
@@ -415,7 +412,7 @@ Student Reviews
 
 ↓
 
-Project Created
+Project Created (solo, or bound to the selected team)
 ```
 
 ---

@@ -56,6 +56,18 @@ export const joinTeam = createAsyncThunk(
   }
 );
 
+export const joinTeamByCode = createAsyncThunk(
+  "team/joinByCode",
+  async (inviteCode, { rejectWithValue }) => {
+    try {
+      const res = await teamService.joinTeamByCode(inviteCode);
+      return res.team;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to join team");
+    }
+  }
+);
+
 export const removeMember = createAsyncThunk(
   "team/removeMember",
   async ({ teamId, userId }, { rejectWithValue }) => {
@@ -132,6 +144,18 @@ const teamSlice = createSlice({
         state.team = action.payload;
       })
       .addCase(joinTeam.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      .addCase(joinTeamByCode.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(joinTeamByCode.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.team = action.payload;
+      })
+      .addCase(joinTeamByCode.rejected, (state, action) => {
+        state.isLoading = false;
         state.error = action.payload;
       })
       // Remove

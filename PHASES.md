@@ -172,6 +172,7 @@ When starting a project, the student chooses:
 - View team members
 - Team leader identification
 - Team member management
+- Shareable human-friendly team invite code (e.g. `ASC-XXXXXX`) for joining
 
 ## Database
 
@@ -187,7 +188,7 @@ Update:
 
 - Student can create a team.
 - Student can invite another student.
-- Student can join a team.
+- Student can join a team (via a shareable invite code).
 - Student can select solo project.
 - Team leader is correctly identified.
 - Unauthorized users cannot manage another team's members.
@@ -225,6 +226,8 @@ For an existing idea, the student can provide:
 - Difficulty
 - Team size
 - Optional SDG information
+
+Team projects are created from the team details page and are bound to that team (the `teamId` flows through setup → ideas → blueprint).
 
 ## Project Workspace
 

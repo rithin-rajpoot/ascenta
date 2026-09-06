@@ -41,6 +41,7 @@ class GeminiService:
         Interests: {data.get('interests', 'Any')}
         
         Provide a short title and a concise description for each idea.
+        IMPORTANT: Respond ONLY in English.
         """
         return self._generate_json(prompt, ProjectIdeasResponse)
 
@@ -52,6 +53,8 @@ class GeminiService:
         Description: {data.get('description')}
         Domain: {data.get('domain', 'Any')}
         Technologies: {data.get('technologies', 'Any')}
+        
+        IMPORTANT: Respond ONLY in English.
         """
         return self._generate_json(prompt, ProjectFeaturesResponse)
 
@@ -63,6 +66,7 @@ class GeminiService:
         Description: {data.get('description')}
         
         For each SDG, provide the goal name, reason for alignment, and expected social impact.
+        IMPORTANT: Respond ONLY in English.
         """
         return self._generate_json(prompt, ProjectSDGsResponse)
 
@@ -77,6 +81,7 @@ class GeminiService:
         Difficulty: {data.get('difficulty', 'Any')}
         
         Provide a comprehensive overview including problem statement, objectives, scope, features, target users, domain, technologies, SDGs, methodology, expected outcome, and future scope.
+        IMPORTANT: Respond ONLY in English.
         """
         return self._generate_json(prompt, ProjectBlueprintResponse)
 

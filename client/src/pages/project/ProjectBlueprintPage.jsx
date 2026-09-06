@@ -14,6 +14,7 @@ function ProjectBlueprintPage() {
 
   const initialIdea = location.state?.initialIdea || { title: "", description: "" };
   const preferences = location.state?.preferences || { domain: "", technologies: "", difficulty: "Intermediate" };
+  const teamId = location.state?.teamId || null;
 
   const [formData, setFormData] = useState({
     title: initialIdea.title,
@@ -89,20 +90,42 @@ function ProjectBlueprintPage() {
         difficulty: formData.difficulty,
       });
 
-      setFormData(prev => ({
-        ...prev,
-        problemStatement: res.data.problemStatement || "",
-        objectives: res.data.objectives || [],
-        scope: res.data.scope || "",
-        targetUsers: res.data.targetUsers || [],
-        methodology: res.data.methodology || "",
-        expectedOutcome: res.data.expectedOutcome || "",
-        futureScope: res.data.futureScope || "",
-        features: res.data.features ? res.data.features.map(f => ({ name: f, isCore: true })) : [],
-        sdgs: res.data.sdgs || [],
-      }));
+      console.log("[Blueprint] Full response:", JSON.stringify(res));
+      console.log("[Blueprint] res.data:", JSON.stringify(res?.data));
+
+      setFormData(prev => {
+        // Guard against array fields coming back as strings/null so the whole
+        // state update can never abort (otherwise no fields populate).
+        const toArray = (val) => {
+          if (Array.isArray(val)) return val;
+          if (typeof val === "string") return val.split(",").map((s) => s.trim()).filter(Boolean);
+          return [];
+        };
+
+        const bp = res?.data || {};
+
+        return {
+          ...prev,
+          title: bp.title || prev.title,
+          description: bp.description || prev.description,
+          domain: bp.domain || prev.domain,
+          technologies: Array.isArray(bp.technologies)
+            ? bp.technologies.join(", ")
+            : (bp.technologies || prev.technologies),
+          problemStatement: bp.problemStatement || "",
+          objectives: toArray(bp.objectives),
+          scope: bp.scope || "",
+          targetUsers: toArray(bp.targetUsers),
+          methodology: bp.methodology || "",
+          expectedOutcome: bp.expectedOutcome || "",
+          futureScope: bp.futureScope || "",
+          features: toArray(bp.features).map((f) => ({ name: f, isCore: true })),
+          sdgs: toArray(bp.sdgs),
+        };
+      });
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to generate blueprint");
+      console.error("[Blueprint] Error:", err);
+      setError(err.response?.data?.message || err.message || "Failed to generate blueprint");
     } finally {
       setAiLoading(prev => ({ ...prev, blueprint: false }));
     }
@@ -118,7 +141,7 @@ function ProjectBlueprintPage() {
       // transform arrays if they were string inputs or handle specifically
       const projectData = {
         ...formData,
-        team: team?._id || null, // null for solo projects
+        team: teamId || team?._id || null, // tied to the current team (or solo)
         technologies: typeof formData.technologies === 'string'
           ? formData.technologies.split(',').map(t => t.trim()).filter(Boolean)
           : formData.technologies,
@@ -139,7 +162,7 @@ function ProjectBlueprintPage() {
     <div className="mx-auto max-w-5xl">
       <div className="flex items-center justify-between">
         <Link
-          to="/project/setup"
+          to={{ pathname: "/project/setup", state: teamId ? { teamId } : undefined }}
           className="inline-flex items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-text-primary"
         >
           <ArrowLeft size={16} />
@@ -237,11 +260,68 @@ function ProjectBlueprintPage() {
             </div>
 
             <div>
+              <label className="mb-1.5 block text-sm font-medium text-text-primary">Objectives</label>
+              <textarea
+                name="objectives"
+                rows="3"
+                value={Array.isArray(formData.objectives) ? formData.objectives.join('\n') : formData.objectives}
+                onChange={(e) => setFormData({ ...formData, objectives: e.target.value.split('\n') })}
+                className="w-full resize-y rounded-lg border border-border bg-background px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                placeholder="One objective per line"
+              ></textarea>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-text-primary">Scope</label>
+              <textarea
+                name="scope"
+                rows="3"
+                value={formData?.scope}
+                onChange={handleChange}
+                className="w-full resize-y rounded-lg border border-border bg-background px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              ></textarea>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-text-primary">Target Users</label>
+              <textarea
+                name="targetUsers"
+                rows="2"
+                value={Array.isArray(formData.targetUsers) ? formData.targetUsers.join(', ') : formData.targetUsers}
+                onChange={(e) => setFormData({ ...formData, targetUsers: e.target.value.split(',').map(u => u.trim()) })}
+                className="w-full resize-y rounded-lg border border-border bg-background px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                placeholder="Comma separated"
+              ></textarea>
+            </div>
+
+            <div>
               <label className="mb-1.5 block text-sm font-medium text-text-primary">Methodology</label>
               <textarea
                 name="methodology"
                 rows="3"
                 value={formData.methodology}
+                onChange={handleChange}
+                className="w-full resize-y rounded-lg border border-border bg-background px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              ></textarea>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-text-primary">Expected Outcome</label>
+              <textarea
+                name="expectedOutcome"
+                rows="3"
+                value={formData.expectedOutcome}
+                onChange={handleChange}
+                className="w-full resize-y rounded-lg border border-border bg-background px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              ></textarea>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-text-primary">Future Scope</label>
+              <textarea
+                name="futureScope"
+                rows="3"
+                value={formData.futureScope}
                 onChange={handleChange}
                 className="w-full resize-y rounded-lg border border-border bg-background px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               ></textarea>

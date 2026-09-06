@@ -147,7 +147,7 @@ Students should be able to:
 
 - Create Team
 - Invite Members
-- Join Existing Team
+- Share a human-friendly invite code (e.g. `ASC-XXXXXX`) and join an existing team with that code
 - Continue as Solo Developer
 
 ---

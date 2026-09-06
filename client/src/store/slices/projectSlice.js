@@ -3,6 +3,7 @@ import * as projectService from "../../services/projectService";
 
 const initialState = {
   currentProject: null,
+  teamProjects: [],
   isLoading: false,
   error: null,
 };
@@ -27,6 +28,18 @@ export const getProject = createAsyncThunk(
       return res.project;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to load project");
+    }
+  }
+);
+
+export const getTeamProjects = createAsyncThunk(
+  "project/getTeamProjects",
+  async (teamId, { rejectWithValue }) => {
+    try {
+      const res = await projectService.getTeamProjects(teamId);
+      return res.projects;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to load team projects");
     }
   }
 );
@@ -80,6 +93,19 @@ const projectSlice = createSlice({
         state.currentProject = action.payload;
       })
       .addCase(getProject.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      // Get Team Projects
+      .addCase(getTeamProjects.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getTeamProjects.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.teamProjects = action.payload;
+      })
+      .addCase(getTeamProjects.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })

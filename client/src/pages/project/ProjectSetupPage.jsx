@@ -1,7 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Sparkles, Edit3, ArrowLeft } from "lucide-react";
 
 function ProjectSetupPage() {
+  const location = useLocation();
+  const teamId = location.state?.teamId || null;
+
+  const linkState = teamId ? { teamId } : undefined;
+
   return (
     <div className="mx-auto max-w-4xl">
       <Link
@@ -31,7 +36,7 @@ function ProjectSetupPage() {
             I need help finding a suitable project idea based on my interests and preferred technologies.
           </p>
           <Link
-            to="/project/ideas"
+            to={{ pathname: "/project/ideas", state: linkState }}
             className="mt-8 inline-flex justify-center rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-dark"
           >
             Generate Ideas
@@ -49,7 +54,7 @@ function ProjectSetupPage() {
             I already know what I want to build and want to create a structured project blueprint.
           </p>
           <Link
-            to="/project/blueprint"
+            to={{ pathname: "/project/blueprint", state: linkState }}
             className="mt-8 inline-flex justify-center rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-medium text-text-primary transition-colors hover:bg-surface"
           >
             Use My Idea

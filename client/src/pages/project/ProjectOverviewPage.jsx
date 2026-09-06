@@ -70,6 +70,47 @@ function ProjectOverviewPage() {
             <h2 className="text-xl font-bold text-text-primary mb-4">Methodology</h2>
             <p className="text-text-secondary whitespace-pre-line">{currentProject.methodology || "Not defined"}</p>
           </div>
+
+          <div className="rounded-2xl border border-border bg-surface p-8 shadow-sm">
+            <h2 className="text-xl font-bold text-text-primary mb-4">Objectives</h2>
+            {currentProject.objectives?.length ? (
+              <ul className="list-inside list-disc space-y-1 text-text-secondary">
+                {currentProject.objectives.map((obj, i) => (
+                  <li key={i}>{obj}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-text-secondary">Not defined</p>
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-border bg-surface p-8 shadow-sm">
+            <h2 className="text-xl font-bold text-text-primary mb-4">Scope</h2>
+            <p className="text-text-secondary whitespace-pre-line">{currentProject.scope || "Not defined"}</p>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-surface p-8 shadow-sm">
+            <h2 className="text-xl font-bold text-text-primary mb-4">Target Users</h2>
+            {currentProject.targetUsers?.length ? (
+              <ul className="list-inside list-disc space-y-1 text-text-secondary">
+                {currentProject.targetUsers.map((user, i) => (
+                  <li key={i}>{user}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-text-secondary">Not defined</p>
+            )}
+          </div>
+
+          <div className="rounded-2xl border border-border bg-surface p-8 shadow-sm">
+            <h2 className="text-xl font-bold text-text-primary mb-4">Expected Outcome</h2>
+            <p className="text-text-secondary whitespace-pre-line">{currentProject.expectedOutcome || "Not defined"}</p>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-surface p-8 shadow-sm">
+            <h2 className="text-xl font-bold text-text-primary mb-4">Future Scope</h2>
+            <p className="text-text-secondary whitespace-pre-line">{currentProject.futureScope || "Not defined"}</p>
+          </div>
         </div>
 
         {/* Sidebar Info */}

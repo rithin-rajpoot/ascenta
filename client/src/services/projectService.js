@@ -10,6 +10,11 @@ export const getProject = async (projectId) => {
   return data;
 };
 
+export const getTeamProjects = async (teamId) => {
+  const { data } = await api.get(`/projects/team/${teamId}`);
+  return data;
+};
+
 export const updateProject = async (projectId, data) => {
   const { data: res } = await api.put(`/projects/${projectId}`, data);
   return res;

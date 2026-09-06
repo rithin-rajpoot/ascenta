@@ -25,6 +25,13 @@ export const getProjectById = async (projectId) => {
   return project;
 };
 
+export const getProjectsByTeam = async (teamId) => {
+  return Project.find({ team: teamId })
+    .populate("owner", "name email")
+    .populate("team", "name")
+    .sort("-createdAt");
+};
+
 export const updateProject = async (projectId, data) => {
   const project = await Project.findByIdAndUpdate(projectId, data, {
     new: true,

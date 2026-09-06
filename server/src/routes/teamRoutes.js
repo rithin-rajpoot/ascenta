@@ -4,6 +4,7 @@ import {
   getTeamController,
   inviteMemberController,
   joinTeamController,
+  joinTeamByCodeController,
   removeMemberController,
   getUserTeamsController,
 } from "../controllers/teamController.js";
@@ -16,6 +17,8 @@ router.use(protect);
 
 router.post("/", authorize("student"), createTeamController);
 router.get("/my-teams", authorize("student"), getUserTeamsController);
+// Static routes must be declared before "/:id" so they are not matched as an id.
+router.post("/join/by-code", authorize("student"), joinTeamByCodeController);
 router.get("/:id", getTeamController);
 router.post("/:id/invite", authorize("student"), inviteMemberController);
 router.post("/:id/join", authorize("student"), joinTeamController);

@@ -3,15 +3,23 @@ import Team from "../models/Team.js";
 
 // Helper to check authorization
 const authorizeProjectAccess = async (project, userId) => {
-  if (project.owner._id.toString() === userId) {
+  const userIdStr = String(userId);
+
+  if (project.owner && String(project.owner._id) === userIdStr) {
     return true;
   }
+
   if (project.team) {
     const team = await Team.findById(project.team._id || project.team);
-    if (team && (team.leader.toString() === userId || team.members.includes(userId))) {
-      return true;
+    if (team) {
+      const isLeader = String(team.leader) === userIdStr;
+      const isMember = team.members.some((m) => String(m) === userIdStr);
+      if (isLeader || isMember) {
+        return true;
+      }
     }
   }
+
   return false;
 };
 
@@ -25,13 +33,37 @@ export const createProjectController = async (req, res, next) => {
       if (!team) {
         return res.status(404).json({ success: false, message: "Team not found" });
       }
-      if (team.leader.toString() !== req.user._id && !team.members.includes(req.user._id)) {
+      const userIdStr = String(req.user._id);
+      const isLeader = String(team.leader) === userIdStr;
+      const isMember = team.members.some((m) => String(m) === userIdStr);
+      if (!isLeader && !isMember) {
         return res.status(403).json({ success: false, message: "Not a member of this team" });
       }
     }
 
     const project = await projectService.createProject(data);
     res.status(201).json({ success: true, project });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTeamProjectsController = async (req, res, next) => {
+  try {
+    const team = await Team.findById(req.params.teamId);
+    if (!team) {
+      return res.status(404).json({ success: false, message: "Team not found" });
+    }
+
+    const userIdStr = String(req.user._id);
+    const isLeader = String(team.leader) === userIdStr;
+    const isMember = team.members.some((m) => String(m) === userIdStr);
+    if (!isLeader && !isMember) {
+      return res.status(403).json({ success: false, message: "Not a member of this team" });
+    }
+
+    const projects = await projectService.getProjectsByTeam(req.params.teamId);
+    res.status(200).json({ success: true, projects });
   } catch (error) {
     next(error);
   }

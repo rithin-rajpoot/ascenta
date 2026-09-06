@@ -134,6 +134,7 @@ Health check: `GET http://localhost:8000/health`
 ### Team Management (Phase 2)
 - Create team with leader assignment
 - Invite members by user ID
+- Shareable human-friendly team invite code (e.g. `ASC-XXXXXX`) — join any team without exposing internal IDs
 - Join existing teams
 - Solo project option
 - Remove members (leader only)
@@ -146,7 +147,8 @@ Health check: `GET http://localhost:8000/health`
 - AI-powered SDG mapping
 - Full blueprint generation (problem statement, objectives, scope, methodology, etc.)
 - Editable blueprint form — students remain in control of AI-generated content
-- Project overview page
+- Team-scoped projects — projects are created and viewed from the team page
+- Project overview page (title, domain, technologies, objectives, scope, target users, methodology, expected outcome, future scope, features, SDGs)
 - Authorization — only owners/team members can access their projects
 
 ---

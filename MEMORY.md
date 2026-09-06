@@ -94,15 +94,15 @@ The Gemini API key must remain inside the FastAPI service and must never be expo
 
 **Phase 3 — Project Creation & AI Project Blueprint is complete.**
 
-Project creation, AI idea generation, feature suggestion, SDG mapping, and blueprint generation are implemented and verified. The user can create solo or team projects from their team dashboard and view the project overview.
+Project creation, AI idea generation, feature suggestion, SDG mapping, and blueprint generation are implemented and verified. The user can create solo or team projects from their team dashboard and view the project overview. Phase 3 has been refined further with team-scoped projects, an enhanced project overview, and hardened project authorization.
 
 ## Current Phase
 
-**Phase 3 — Project Creation & AI Project Blueprint (COMPLETED)**
+**Phase 3 — Project Creation & AI Project Blueprint (COMPLETED, refinements staged)**
 
 ## Current Task
 
-Phase 3 is complete. Awaiting approval to begin Phase 4 — AI Project Blueprint Generator.
+Phase 3 work (team invite codes, team-scoped projects, project overview enhancements, hardened project authorization) is complete and ready to commit/push. Phase 4 — AI Project Blueprint Generator has not yet started.
 
 ---
 
@@ -137,6 +137,7 @@ Phase 3 is complete. Awaiting approval to begin Phase 4 — AI Project Blueprint
 - Invite members
 - Join team
 - Solo project
+- Shareable human-friendly team invite code (e.g. `ASC-XXXXXX`) for joining a team
 
 ### Project Management
 
@@ -531,19 +532,50 @@ A complete working project lifecycle is more important than having many partiall
 - Added protected routes: /team/setup, /team/create, /team/join, /team/:id.
 - Verified frontend production build succeeds.
 - Verified all team APIs end-to-end: create, get, invite, join, remove, with proper authorization.
+## Phase 3 — Project Creation & AI Blueprint (Completed, refinements)
+
+- Added `inviteCode` to the `Team` model (unique, shareable `ASC-XXXXXX` codes) with a `generateInviteCode` utility and automatic backfill for legacy teams.
+- Added `POST /api/teams/join/by-code` route + `joinTeamByCode` service so students join by a human-friendly code instead of a raw MongoDB ID.
+- Fixed the `team.populate(...).populate is not a function` crash after `save()` — populated references are now awaited separately via `loadTeamRefs`.
+- `inviteMember`, `joinTeam`, `joinTeamByCode`, and `removeMember` now return fully populated teams (leader/members + invite code).
+- Team-scoped projects: `teamId` is carried through setup → ideas → blueprint and tied to the project; added `getTeamProjects` API + `projectSlice`/`projectService` wiring; Team Details shows the team's project + "Start Project".
+- Hardened project authorization: ObjectIds compared as strings for owner/leader/member checks; added `getTeamProjectsController` (members only).
+- `ProjectOverviewPage` now renders Objectives, Scope, Target Users, Expected Outcome, and Future Scope.
+- `ProjectBlueprintPage` resiliently guards string/null array fields; AI proxy adds request/response logging; Gemini prompts forced to respond in English only.
+- `JoinTeamPage` takes an invite code (auto-uppercase); `TeamDetailsPage` shows the shareable invite code with a copy button and improved member-management UX (confirm remove, loading/success/error states, member count).
 
 ---
 
 # 15. Current Task
 
-**Phase 3 is complete. Awaiting approval to start Phase 4 — AI Project Blueprint Generator.**
+**Phase 3 work (team invite codes, team-scoped projects, project overview enhancements, hardened project authorization) is complete and staged to push. Phase 4 — AI Project Blueprint Generator has not yet started.**
 
 ---
 
 # 16. Files Currently Being Worked On
 
 ```text
-None currently — Phase 0–3 are complete.
+Staged for the current Phase 2/3 commit:
+server/src/utils/generateInviteCode.js         (new)
+server/src/models/Team.js
+server/src/controllers/teamController.js
+server/src/routes/teamRoutes.js
+server/src/services/teamService.js
+server/src/controllers/projectController.js
+server/src/routes/projectRoutes.js
+server/src/services/projectService.js
+server/src/controllers/aiController.js
+ai-service/app/services/gemini_service.py
+client/src/pages/team/JoinTeamPage.jsx
+client/src/pages/team/TeamDetailsPage.jsx
+client/src/services/teamService.js
+client/src/store/slices/teamSlice.js
+client/src/services/projectService.js
+client/src/store/slices/projectSlice.js
+client/src/pages/project/ProjectSetupPage.jsx
+client/src/pages/project/ProjectIdeasPage.jsx
+client/src/pages/project/ProjectBlueprintPage.jsx
+client/src/pages/project/ProjectOverviewPage.jsx
 ```
 
 ---
@@ -576,6 +608,19 @@ Impact:
 - Phase 0 now includes Redux Toolkit configuration alongside React Router.
 - client/package.json will include `@reduxjs/toolkit` and `react-redux`.
 
+### 2026-09-06 — Human-Friendly Team Invite Codes
+
+Decision:
+Teams use a shareable, human-friendly invite code (`ASC-XXXXXX`, e.g. `ASC-K7M2QP`) for joining instead of a raw MongoDB ObjectId.
+
+Reason:
+MongoDB IDs are not user-friendly and were not surfaced anywhere in the team UI, making it hard for peers to join. A short, unambiguous code is easy to share and type.
+
+Impact:
+- `Team` model gained a unique `inviteCode` field; legacy teams are backfilled on read.
+- Joining is now done via `POST /api/teams/join/by-code`; the old `/:id/join` route is kept for backward compatibility.
+- Codes are case-insensitive (normalized to uppercase) and generated with an ambiguous-character-free alphabet.
+- Team Details shows the code with a copy button; the Join page accepts the code.
 Use this format for future decisions:
 
 ```text
@@ -651,6 +696,18 @@ Use this section for major completed changes.
 - Added: Validation in `authService.js` to ensure login attempts match the selected role.
 - Added: Role-based dashboard rendering in `HomePage.jsx` to direct Students to Projects/Teams and Faculty to their dashboard.
 - Verified: Phases 0-3 strictly restrict Faculty from accessing Student-only creation routes.
+### 2026-09-06 — Phase 2/3 Refinements: Team Invite Codes & Team-Scoped Projects
+
+- Added: Shareable human-friendly team invite codes (`ASC-XXXXXX`) via new `utils/generateInviteCode.js` and an `inviteCode` field on the `Team` model (unique, backfilled for legacy teams).
+- Added: `POST /api/teams/join/by-code` endpoint and `joinTeamByCode` service so students join by invite code instead of a raw MongoDB ID.
+- Fixed: `team.populate(...).populate is not a function` crash after `save()` (document populate returns a Promise); replaced with separately awaited `loadTeamRefs`, and all mutating team endpoints now return fully populated teams.
+- Added: `getTeamProjects` API + `projectSlice`/`projectService` wiring; `teamId` now flows through setup → ideas → blueprint so projects are tied to the correct team; Team Details shows the team's project with a "Start Project" action.
+- Added: `ProjectOverviewPage` sections for Objectives, Scope, Target Users, Expected Outcome, and Future Scope.
+- Hardened: Project authorization compares ObjectIds as strings for owner/leader/member checks.
+- Added: `JoinTeamPage` invite-code input (auto-uppercase) and Team Details invite-code card with copy-to-clipboard.
+- Improved: Team Details member management UX (confirm before remove, loading/success/error states, member count, stale-team clear on navigation).
+- Improved: `ProjectBlueprintPage` guards string/null array fields; AI proxy request/response logging; Gemini prompts forced to respond only in English.
+- Verified: Frontend production build succeeds; server `node --check` passes on all modified files.
 ```
 
 Keep entries concise.

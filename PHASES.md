@@ -479,6 +479,20 @@ Create:
 - Task ownership is respected.
 - Kanban board works on desktop and smaller screens.
 
+> **Implementation note:** Tasks live under nested project routes
+> (`GET/POST /api/projects/:projectId/tasks`, `PUT/DELETE .../tasks/:taskId`). The project owner
+> or team leader creates, assigns, edits, and deletes tasks; assignees can update only the
+> status of their own tasks (the server rejects any other field change from non-managers).
+> Tasks can only be assigned to the owner, leader, or team members. The Kanban board
+> (`ProjectTasksPage`, route `/project/:id/tasks`) has four columns (Todo / In Progress /
+> Review / Completed) with HTML5 drag-and-drop plus a "Move to" dropdown fallback for touch and
+> smaller screens, and supports filtering by assignee and priority. Task progress is reflected
+> in the project workspace via an Overview card.
+
+## Status
+
+**COMPLETED**
+
 ---
 
 # Phase 7 — Faculty Review Portal

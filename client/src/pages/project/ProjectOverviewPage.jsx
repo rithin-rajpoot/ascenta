@@ -1,18 +1,21 @@
 import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Loader2, ArrowLeft, CheckCircle2, Milestone as MilestoneIcon, ArrowRight } from "lucide-react";
+import { Loader2, ArrowLeft, CheckCircle2, Milestone as MilestoneIcon, ListChecks as TaskIcon, ArrowRight } from "lucide-react";
 import { getProject, getMilestones } from "../../store/slices/projectSlice";
+import { getTasks } from "../../store/slices/taskSlice";
 
 function ProjectOverviewPage() {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { currentProject, milestones, isLoading, error } = useSelector((state) => state.project);
+  const { tasks } = useSelector((state) => state.task);
 
   useEffect(() => {
     if (id) {
       dispatch(getProject(id));
       dispatch(getMilestones(id));
+      dispatch(getTasks(id));
     }
   }, [dispatch, id]);
 
@@ -86,6 +89,38 @@ function ProjectOverviewPage() {
                   <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-background">
                     <div
                       className="h-full rounded-full bg-success transition-all duration-300"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
+          <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <h2 className="flex items-center gap-2 text-lg font-bold text-text-primary">
+                <TaskIcon size={20} className="text-primary" />
+                Tasks
+              </h2>
+              <Link
+                to={`/project/${id}/tasks`}
+                className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-dark"
+              >
+                Open Board <ArrowRight size={15} />
+              </Link>
+            </div>
+            {(() => {
+              const done = tasks.filter((t) => t.status === "Completed").length;
+              const pct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
+              return (
+                <div className="mt-4">
+                  <p className="text-sm text-text-secondary">
+                    {done} of {tasks.length} tasks completed
+                  </p>
+                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-background">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all duration-300"
                       style={{ width: `${pct}%` }}
                     />
                   </div>

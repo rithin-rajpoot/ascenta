@@ -17,6 +17,7 @@ import ProjectIdeasPage from "../pages/project/ProjectIdeasPage";
 import ProjectBlueprintPage from "../pages/project/ProjectBlueprintPage";
 import ProjectOverviewPage from "../pages/project/ProjectOverviewPage";
 import ProjectMilestonesPage from "../pages/project/ProjectMilestonesPage";
+import ProjectTasksPage from "../pages/project/ProjectTasksPage";
 
 function AppRoutes() {
   return (
@@ -112,7 +113,15 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
-        
+        <Route
+          path="/project/:id/tasks"
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <ProjectTasksPage />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

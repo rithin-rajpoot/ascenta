@@ -92,17 +92,17 @@ The Gemini API key must remain inside the FastAPI service and must never be expo
 
 ## Overall Status
 
-**Phase 5 — Milestone Planning is complete.**
+**Phase 6 — Task Management / Kanban Board is complete.**
 
-Students can convert their project blueprint into an actionable development plan. Milestones support create/edit/delete, deadlines, and status tracking (Pending / In Progress / Completed). Milestone progress is reflected in the project workspace and on a dedicated milestone page. Mutations are restricted to the project owner or team leader, while all project members can view milestones and progress.
+Teams can manage day-to-day project work on a four-column Kanban board (Todo / In Progress / Review / Completed). The project owner or team leader creates, assigns (leader + members), edits, and deletes tasks with priority and due dates; assignees can update only the status of their own tasks. Tasks move via drag-and-drop or a "Move to" dropdown, with assignee/priority filters. Task progress is reflected in the project workspace.
 
 ## Current Phase
 
-**Phase 5 — Milestone Planning (COMPLETED)**
+**Phase 6 — Task Management / Kanban Board (COMPLETED)**
 
 ## Current Task
 
-Phase 5 — Milestone Planning is complete and ready to commit/push. Phase 6 — Task Management / Kanban Board has not yet started.
+Phase 6 — Task Management / Kanban Board is complete and ready to commit/push. Phase 7 — Faculty Review Portal has not yet started.
 
 ---
 
@@ -725,6 +725,14 @@ Use this section for major completed changes.
 - Added: Milestone API/service functions and `projectSlice` thunks/reducers (`getMilestones`, `createMilestone`, `updateMilestone`, `deleteMilestone`).
 - Updated: `projectService.getProjectById` populates the team `leader` so the frontend can compute manager state.
 - Verified: Server app imports and HTTP route registration confirmed; frontend production build succeeds; server `node --check` passes on all modified files.
+### 2026-09-06 — Phase 6: Task Management / Kanban Board
+
+- Added: `Task` model (title, description, project, assignedTo, priority Low/Medium/High, dueDate, status Todo/In Progress/Review/Completed, createdBy).
+- Added: `taskService`, `taskController`, and nested `taskRoutes` exposed under `/api/projects/:projectId/tasks` (GET list, POST create, PUT update, DELETE). Owner/leader manage all tasks; assignees may update only the status of their own tasks; tasks can only be assigned to owner/leader/team members.
+- Added: `ProjectTasksPage` (route `/project/:id/tasks`) — four-column Kanban board with HTML5 drag-and-drop, "Move to" dropdown fallback for touch/small screens, assignee + priority filters, and confirm-before-delete.
+- Added: `taskService` API client, `taskSlice` (thunks + reducers), and store registration.
+- Updated: `projectService.getProjectById` now populates team `leader` and `members` (name, email) for assignment dropdowns; `ProjectOverviewPage` shows a Tasks progress card with "Open Board" link.
+- Verified: Server `node --check` passes on all modified files and route import succeeds; frontend production build succeeds.
 ```
 
 Keep entries concise.

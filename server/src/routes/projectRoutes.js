@@ -6,6 +6,7 @@ import {
   getTeamProjectsController,
 } from "../controllers/projectController.js";
 import milestoneRoutes from "./milestoneRoutes.js";
+import taskRoutes from "./taskRoutes.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 
 const router = Router();
@@ -18,6 +19,7 @@ router.post("/", createProjectController);
 // Must be declared before "/:id" so "team/:teamId" is not matched as an id
 router.get("/team/:teamId", getTeamProjectsController);
 router.use("/:projectId/milestones", milestoneRoutes);
+router.use("/:projectId/tasks", taskRoutes);
 router.get("/:id", getProjectController);
 router.put("/:id", updateProjectController);
 

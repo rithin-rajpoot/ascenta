@@ -19,7 +19,11 @@ export const createProject = async (data) => {
 export const getProjectById = async (projectId) => {
   const project = await Project.findById(projectId)
     .populate("owner", "name email")
-    .populate("team", "name leader");
+    .populate({
+      path: "team",
+      select: "name leader members",
+      populate: { path: "leader members", select: "name email" },
+    });
   if (!project) {
     const error = new Error("Project not found");
     error.status = 404;

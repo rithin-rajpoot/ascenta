@@ -166,6 +166,13 @@ Health check: `GET http://localhost:8000/health`
 - Leader/owner-managed milestone planning, viewable by all project members
 - Milestones are exposed as nested project routes (`/api/projects/:projectId/milestones`)
 
+### Task Management / Kanban Board (Phase 6)
+- Four-column Kanban board (Todo / In Progress / Review / Completed) with drag-and-drop and a "Move to" dropdown for smaller screens
+- Leaders/owners create, assign, edit, and delete tasks; assignees can update the status of their own tasks
+- Tasks carry description, assignee, priority (Low/Medium/High), due date, and status
+- Filter tasks by assignee and priority; task progress shown in the project workspace
+- Tasks are exposed as nested project routes (`/api/projects/:projectId/tasks`)
+
 ---
 
 ## Phase Status
@@ -176,5 +183,6 @@ Health check: `GET http://localhost:8000/health`
 - **Phase 3 — Project Creation & AI Blueprint:** Completed
 - **Phase 4 — AI Project Blueprint Generator:** Completed
 - **Phase 5 — Milestone Planning:** Completed
+- **Phase 6 — Task Management / Kanban Board:** Completed
 
 See `PHASES.md` for the full development roadmap.

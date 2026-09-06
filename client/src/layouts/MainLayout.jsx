@@ -46,6 +46,11 @@ function MainLayout() {
                     Teams
                   </NavLink>
                 )}
+                {user.role === "faculty" && (
+                  <NavLink to="/" className={navLinkClass}>
+                    Dashboard
+                  </NavLink>
+                )}
                 <NavLink to="/profile" className={navLinkClass}>
                   <span className="flex items-center gap-1.5">
                     <UserIcon size={14} />

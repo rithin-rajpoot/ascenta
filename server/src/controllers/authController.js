@@ -1,8 +1,8 @@
-import { registerStudent, loginUser, getProfile } from "../services/authService.js";
+import { registerUser, loginUser, getProfile } from "../services/authService.js";
 
 export const register = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -11,7 +11,7 @@ export const register = async (req, res, next) => {
       });
     }
 
-    const result = await registerStudent({ name, email, password });
+    const result = await registerUser({ name, email, password, role });
     res.status(201).json({ success: true, ...result });
   } catch (error) {
     next(error);
@@ -20,7 +20,7 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
@@ -29,7 +29,7 @@ export const login = async (req, res, next) => {
       });
     }
 
-    const result = await loginUser({ email, password });
+    const result = await loginUser({ email, password, role });
     res.status(200).json({ success: true, ...result });
   } catch (error) {
     next(error);

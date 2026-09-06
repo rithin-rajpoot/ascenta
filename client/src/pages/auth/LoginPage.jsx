@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { LogIn } from "lucide-react";
+import { LogIn, User, BookOpen } from "lucide-react";
 import { loginUser, clearError } from "../../store/slices/authSlice";
 
 function LoginPage() {
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ email: "", password: "", role: "student" });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isLoading, error, user } = useSelector((state) => state.auth);
@@ -16,6 +16,8 @@ function LoginPage() {
   }, [user, navigate, dispatch]);
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  
+  const handleRoleChange = (role) => setForm({ ...form, role });
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -44,6 +46,33 @@ function LoginPage() {
         )}
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
+          <div className="grid grid-cols-2 gap-3 mb-2">
+            <button
+              type="button"
+              onClick={() => handleRoleChange("student")}
+              className={`flex items-center justify-center gap-2 rounded-lg border p-3 text-sm font-medium transition-colors ${
+                form.role === "student"
+                  ? "border-primary bg-primary-light text-primary-dark"
+                  : "border-border bg-background text-text-secondary hover:border-border-hover"
+              }`}
+            >
+              <User size={16} />
+              Student
+            </button>
+            <button
+              type="button"
+              onClick={() => handleRoleChange("faculty")}
+              className={`flex items-center justify-center gap-2 rounded-lg border p-3 text-sm font-medium transition-colors ${
+                form.role === "faculty"
+                  ? "border-primary bg-primary-light text-primary-dark"
+                  : "border-border bg-background text-text-secondary hover:border-border-hover"
+              }`}
+            >
+              <BookOpen size={16} />
+              Faculty
+            </button>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-text-primary">
               Email

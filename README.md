@@ -122,11 +122,40 @@ Health check: `GET http://localhost:8000/health`
 
 ---
 
+## Features Implemented
+
+### Authentication & User Management (Phase 1)
+- Student and Faculty registration with role selection
+- Secure login with JWT authentication
+- Password hashing (bcrypt)
+- Role-based route protection (frontend + backend)
+- User profile management
+
+### Team Management (Phase 2)
+- Create team with leader assignment
+- Invite members by user ID
+- Join existing teams
+- Solo project option
+- Remove members (leader only)
+- My Teams dashboard
+
+### Project Creation & AI Blueprint (Phase 3)
+- Project creation (solo or team-based)
+- AI-powered project idea generation (Gemini API)
+- AI-powered feature suggestions
+- AI-powered SDG mapping
+- Full blueprint generation (problem statement, objectives, scope, methodology, etc.)
+- Editable blueprint form — students remain in control of AI-generated content
+- Project overview page
+- Authorization — only owners/team members can access their projects
+
+---
+
 ## Phase Status
 
 - **Phase 0 — Project Foundation:** Completed
 - **Phase 1 — Authentication & User Management:** Completed
 - **Phase 2 — Team Management:** Completed
-- **Phase 3 — Project Creation & Project Workspace:** Pending
+- **Phase 3 — Project Creation & AI Blueprint:** Completed
 
 See `PHASES.md` for the full development roadmap.

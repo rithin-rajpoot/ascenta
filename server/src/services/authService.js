@@ -2,9 +2,9 @@ import User from "../models/User.js";
 import generateToken from "../utils/generateToken.js";
 
 /**
- * Register a new user (student)
+ * Register a new user
  */
-export const registerStudent = async ({ name, email, password }) => {
+export const registerUser = async ({ name, email, password, role }) => {
   const existing = await User.findOne({ email });
   if (existing) {
     const error = new Error("User already exists");
@@ -12,7 +12,9 @@ export const registerStudent = async ({ name, email, password }) => {
     throw error;
   }
 
-  const user = await User.create({ name, email, password, role: "student" });
+  const validRole = ["student", "faculty"].includes(role) ? role : "student";
+
+  const user = await User.create({ name, email, password, role: validRole });
   return {
     user: {
       id: user._id,
@@ -27,11 +29,17 @@ export const registerStudent = async ({ name, email, password }) => {
 /**
  * Login — works for both students and faculty
  */
-export const loginUser = async ({ email, password }) => {
+export const loginUser = async ({ email, password, role }) => {
   const user = await User.findOne({ email }).select("+password");
   if (!user || !(await user.matchPassword(password))) {
     const error = new Error("Invalid email or password");
     error.status = 401;
+    throw error;
+  }
+
+  if (role && user.role !== role) {
+    const error = new Error(`No account found with this email as a ${role}`);
+    error.status = 404;
     throw error;
   }
 

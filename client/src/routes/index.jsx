@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import AuthLayout from "../layouts/AuthLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
@@ -12,6 +12,10 @@ import CreateTeamPage from "../pages/team/CreateTeamPage";
 import JoinTeamPage from "../pages/team/JoinTeamPage";
 import TeamDetailsPage from "../pages/team/TeamDetailsPage";
 import MyTeamsPage from "../pages/team/MyTeamsPage";
+import ProjectSetupPage from "../pages/project/ProjectSetupPage";
+import ProjectIdeasPage from "../pages/project/ProjectIdeasPage";
+import ProjectBlueprintPage from "../pages/project/ProjectBlueprintPage";
+import ProjectOverviewPage from "../pages/project/ProjectOverviewPage";
 
 function AppRoutes() {
   return (
@@ -67,6 +71,41 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/project/setup"
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <ProjectSetupPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/project/ideas"
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <ProjectIdeasPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/project/blueprint"
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <ProjectBlueprintPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/project/:id"
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <ProjectOverviewPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
 
       <Route element={<AuthLayout />}>

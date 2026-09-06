@@ -63,16 +63,26 @@ function TeamDetailsPage() {
       </Link>
 
       <div className="mt-4 rounded-2xl border border-border bg-surface p-8 shadow-sm">
-        <div className="flex items-center gap-4">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-white">
-            <Users size={26} />
-          </span>
-          <div>
-            <h1 className="text-2xl font-bold text-text-primary">{team.name}</h1>
-            <p className="text-sm text-text-secondary">
-              {isLeader ? "You are the team leader" : "Team member"}
-            </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-white">
+              <Users size={26} />
+            </span>
+            <div>
+              <h1 className="text-2xl font-bold text-text-primary">{team.name}</h1>
+              <p className="text-sm text-text-secondary">
+                {isLeader ? "You are the team leader" : "Team member"}
+              </p>
+            </div>
           </div>
+          {isLeader && (
+            <Link
+              to="/project/setup"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark"
+            >
+              Start Project
+            </Link>
+          )}
         </div>
 
         {error && (

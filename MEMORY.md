@@ -92,17 +92,17 @@ The Gemini API key must remain inside the FastAPI service and must never be expo
 
 ## Overall Status
 
-**Phase 2 — Team Management is complete.**
+**Phase 3 — Project Creation & AI Project Blueprint is complete.**
 
-Team creation, joining, member invitation, member removal, team leader permissions, and role-based authorization are implemented and verified.
+Project creation, AI idea generation, feature suggestion, SDG mapping, and blueprint generation are implemented and verified. The user can create solo or team projects from their team dashboard and view the project overview.
 
 ## Current Phase
 
-**Phase 2 — Team Management (COMPLETED)**
+**Phase 3 — Project Creation & AI Project Blueprint (COMPLETED)**
 
 ## Current Task
 
-Awaiting approval to begin Phase 3 — Project Creation & Project Workspace.
+Phase 3 is complete. Awaiting approval to begin Phase 4 — AI Project Blueprint Generator.
 
 ---
 
@@ -536,14 +536,14 @@ A complete working project lifecycle is more important than having many partiall
 
 # 15. Current Task
 
-**Phase 2 is complete. Awaiting approval to start Phase 3 — Project Creation & Project Workspace.**
+**Phase 3 is complete. Awaiting approval to start Phase 4 — AI Project Blueprint Generator.**
 
 ---
 
 # 16. Files Currently Being Worked On
 
 ```text
-None currently — Phase 2 is complete.
+None currently — Phase 0–3 are complete.
 ```
 
 ---
@@ -634,6 +634,23 @@ Use this section for major completed changes.
 - Added: Frontend `MyTeamsPage` dashboard.
 - Added: "Teams" navigation link in `MainLayout`.
 - Verified: Dashboard correctly displays existing teams and prompts for team creation if empty.
+
+### 2026-08-25 — Phase 3: Project Creation & AI Blueprint
+
+- Added: `Project` MongoDB schema including fields for title, description, domain, technologies, features, SDGs, problem statement, objectives, etc.
+- Added: FastAPI AI Service endpoints (`/ai/project-ideas`, `/ai/project-features`, `/ai/project-sdgs`, `/ai/project-blueprint`) with `google-generativeai` integration and Pydantic schemas.
+- Added: Node.js API routes for CRUD operations on Projects (`POST /api/projects`, `GET /api/projects/:id`, `PUT /api/projects/:id`) and proxy routes for AI requests (`/api/ai/*`).
+- Added: Redux `projectSlice` and frontend services (`projectService.js`, `aiService.js`).
+- Added: React Pages for the project creation flow: `ProjectSetupPage`, `ProjectIdeasPage`, `ProjectBlueprintPage`, and `ProjectOverviewPage`.
+- Added: "Start Project" button in Team Dashboard to connect the Phase 2 flow to Phase 3.
+- Verified: Flow allows choosing AI idea or manual idea, mapping SDGs, suggesting features, generating blueprint, saving project, and viewing overview.
+- Verified: Authorization enforces that only authorized users (owners/team members) can access their project.
+### 2026-08-25 — Phase 1: Authentication & User Management (Role Expansion)
+
+- Added: Role selection to both Registration and Login pages (Student vs Faculty).
+- Added: Validation in `authService.js` to ensure login attempts match the selected role.
+- Added: Role-based dashboard rendering in `HomePage.jsx` to direct Students to Projects/Teams and Faculty to their dashboard.
+- Verified: Phases 0-3 strictly restrict Faculty from accessing Student-only creation routes.
 ```
 
 Keep entries concise.

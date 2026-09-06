@@ -126,9 +126,9 @@ Create:
 
 ## Completion Criteria
 
-- Student can register.
+- Student can register with role selection.
 - Student can log in.
-- Faculty can log in.
+- Faculty can register and log in.
 - Invalid credentials are rejected.
 - Protected APIs require authentication.
 - Role restrictions work correctly.
@@ -254,6 +254,10 @@ Create:
 - Team projects work.
 - Project workspace opens correctly.
 - Project information can be viewed and edited.
+
+## Status
+
+**COMPLETED**
 
 ---
 

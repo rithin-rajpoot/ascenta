@@ -18,6 +18,7 @@ import ProjectBlueprintPage from "../pages/project/ProjectBlueprintPage";
 import ProjectOverviewPage from "../pages/project/ProjectOverviewPage";
 import ProjectMilestonesPage from "../pages/project/ProjectMilestonesPage";
 import ProjectTasksPage from "../pages/project/ProjectTasksPage";
+import ProjectAssistantPage from "../pages/project/ProjectAssistantPage";
 import FacultyDashboardPage from "../pages/faculty/FacultyDashboardPage";
 import FacultyProjectPage from "../pages/faculty/FacultyProjectPage";
 
@@ -120,6 +121,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute roles={["student", "faculty"]}>
               <ProjectTasksPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/project/:id/assistant"
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <ProjectAssistantPage />
             </ProtectedRoute>
           }
         />

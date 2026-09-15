@@ -596,6 +596,16 @@ This makes the assistant more useful than a generic chatbot.
 - API failures are handled.
 - Conversation UI is usable.
 
+> **Implementation note:** `POST /ai/assistant` (FastAPI, proxied by the Express backend at
+> `POST /api/ai/assistant`, student-only) returns free-text guidance — the first endpoint that
+> does not use the JSON response-schema path. Each request carries the project context
+> (title, description, domain, technologies, features, methodology) plus the last ~6 conversation
+> turns for continuity. System rules enforce: guidance-not-guarantee, no secrets, no code
+> execution, no automatic project modification. The chat UI (`ProjectAssistantPage`,
+> `/project/:id/assistant`, opened from an Overview card) shows suggestion chips, a typing
+> indicator, error bubbles with retry (the failed question is restored to the input), and
+> auto-scroll.
+
 ---
 
 # Phase 9 — AI Documentation Generator

@@ -19,6 +19,7 @@ import {
   updateTask,
   deleteTask,
 } from "../../store/slices/taskSlice";
+import ProjectTabs from "../../components/ProjectTabs";
 
 const COLUMNS = ["Todo", "In Progress", "Review", "Completed"];
 const PRIORITIES = ["Low", "Medium", "High"];
@@ -221,7 +222,7 @@ function ProjectTasksPage() {
     task.assignedTo ? task.assignedTo.name || "Team member" : "Unassigned";
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
           to={`/project/${id}`}
@@ -240,6 +241,8 @@ function ProjectTasksPage() {
           </button>
         )}
       </div>
+
+      <ProjectTabs id={id} />
 
       <div className="flex items-center gap-3">
         <ListChecks size={24} className="text-primary" />

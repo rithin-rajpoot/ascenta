@@ -181,6 +181,13 @@ Health check: `GET http://localhost:8000/health`
 - Faculty submit feedback (comment + optional 1–5 rating); students see feedback history (read-only) on the project overview
 - Feedback is exposed as `/api/faculty/projects/:projectId/reviews`; students have no write access
 
+### AI Technical Assistant (Phase 8)
+- Project-aware chat assistant opened from the project workspace (`/project/:id/assistant`)
+- Answers technical questions: concepts, APIs, database structures, auth, architecture, debugging, implementation approaches
+- Each request carries the project context (title, description, features, technologies, methodology) and recent conversation turns
+- Responses are guidance only — no secrets, no code execution, no automatic project modification
+- Exposed as `POST /ai/assistant` (FastAPI) proxied by the Express backend; failures surface as retryable error bubbles
+
 ## Phase Status
 
 - **Phase 0 — Project Foundation:** Completed
@@ -191,5 +198,6 @@ Health check: `GET http://localhost:8000/health`
 - **Phase 5 — Milestone Planning:** Completed
 - **Phase 6 — Task Management / Kanban Board:** Completed
 - **Phase 7 — Faculty Review Portal:** Completed
+- **Phase 8 — AI Technical Assistant:** Completed
 
 See `PHASES.md` for the full development roadmap.

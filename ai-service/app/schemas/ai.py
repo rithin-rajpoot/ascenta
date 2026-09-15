@@ -60,3 +60,30 @@ class ProjectBlueprintResponse(BaseModel):
     methodology: str
     expectedOutcome: str
     futureScope: str
+
+
+# --- Phase 8: AI Technical Assistant ---
+
+class AssistantContext(BaseModel):
+    """Relevant project context passed with each question."""
+    title: Optional[str] = None
+    description: Optional[str] = None
+    domain: Optional[str] = None
+    technologies: Optional[str] = None
+    features: Optional[List[str]] = None
+    methodology: Optional[str] = None
+
+
+class AssistantMessage(BaseModel):
+    role: str  # "user" or "assistant"
+    content: str
+
+
+class AssistantRequest(BaseModel):
+    question: str
+    history: Optional[List[AssistantMessage]] = None
+    context: Optional[AssistantContext] = None
+
+
+class AssistantResponse(BaseModel):
+    answer: str

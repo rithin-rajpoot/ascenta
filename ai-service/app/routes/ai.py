@@ -3,7 +3,8 @@ from app.schemas.ai import (
     ProjectIdeaRequest, ProjectIdeasResponse,
     ProjectFeaturesRequest, ProjectFeaturesResponse,
     ProjectSDGsRequest, ProjectSDGsResponse,
-    ProjectBlueprintRequest, ProjectBlueprintResponse
+    ProjectBlueprintRequest, ProjectBlueprintResponse,
+    AssistantRequest, AssistantResponse
 )
 from app.services.gemini_service import gemini_service
 
@@ -28,3 +29,8 @@ async def generate_project_sdgs(request: ProjectSDGsRequest):
 async def generate_project_blueprint(request: ProjectBlueprintRequest):
     result = gemini_service.generate_blueprint(request.model_dump())
     return {"success": True, "data": result}
+
+@router.post("/assistant", response_model=AssistantResponse)
+async def ai_assistant(request: AssistantRequest):
+    result = gemini_service.generate_assistant(request.model_dump())
+    return result

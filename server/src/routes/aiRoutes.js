@@ -4,6 +4,7 @@ import {
   generateProjectFeatures,
   generateProjectSdgs,
   generateProjectBlueprint,
+  generateAssistant,
 } from "../controllers/aiController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 
@@ -17,5 +18,6 @@ router.post("/project-ideas", generateProjectIdeas);
 router.post("/project-features", generateProjectFeatures);
 router.post("/project-sdgs", generateProjectSdgs);
 router.post("/project-blueprint", generateProjectBlueprint);
+router.post("/assistant", generateAssistant);
 
 export default router;

@@ -92,17 +92,17 @@ The Gemini API key must remain inside the FastAPI service and must never be expo
 
 ## Overall Status
 
-**Phase 7 — Faculty Review Portal is complete.**
+**Phase 8 — AI Technical Assistant is complete.**
 
-Students (project owner/team leader) assign a faculty reviewer to their project. Faculty get a portal at `/faculty` listing assigned projects, with a project detail view showing team members and milestone/task progress. Faculty submit feedback (comment + optional 1–5 rating) stored in `FacultyReview`; students see the feedback history (read-only) on the project overview. Students have no write access to feedback.
+Students open a project-aware chat assistant from the project workspace (`/project/:id/assistant`). The assistant answers technical questions (concepts, APIs, database structures, auth, architecture, debugging, implementation approaches) with the project blueprint as context, plus the last ~6 conversation turns for continuity. Responses are guidance-only; no secrets, no code execution, no automatic project data modification. Exposed as `POST /ai/assistant` (FastAPI, free-text generation) proxied by `POST /api/ai/assistant` (student-only). API failures surface as retryable error bubbles.
 
 ## Current Phase
 
-**Phase 7 — Faculty Review Portal (COMPLETED)**
+**Phase 8 — AI Technical Assistant (COMPLETED)**
 
 ## Current Task
 
-Phase 7 — Faculty Review Portal is complete and ready to commit/push. Phase 8 — AI Technical Assistant has not yet started.
+Phase 8 — AI Technical Assistant is complete and ready to commit/push. All MVP phases (0–8) are complete; see PHASES.md for any remaining roadmap items.
 
 ---
 
@@ -743,6 +743,13 @@ Use this section for major completed changes.
 - Verified: Server `node --check` passes and `app.js` imports cleanly; frontend production build succeeds.
 - Updated (Phase 7 polish): Faculty assignment is now a button → modal → confirm flow on the project overview (select from faculty list, confirm triggers the API, `currentProject` updates live via a cross-slice reducer in `projectSlice` — no page refresh). `FacultyProjectPage` now shows the full task board (read-only 4-column Kanban of all tasks with assignee, priority, and due date).
 - Updated (Phase 7 polish 2): Reviewer name (+ email) is now always visible in the Faculty Review card for all project members. Faculty view reuses the exact student pages — `isProjectMember` now grants read access to the assigned faculty, project routes allow the faculty role on GETs (mutations stay student-only/owner-leader), `/project/:id`, `/milestones`, and `/tasks` routes accept faculty, and `FacultyProjectPage` embeds `ProjectOverviewPage` (embedded mode hides the student back-link) plus the faculty feedback form.
+### 2026-09-06 — Phase 8: AI Technical Assistant
+
+- Added (ai-service): `AssistantContext`/`AssistantMessage`/`AssistantRequest`/`AssistantResponse` schemas, `POST /ai/assistant` route, and `generate_assistant` on `GeminiService` — first free-text generation path (new `_generate_text`); prompt includes project context + last ~6 turns and enforces guidance-only/no-secrets/no-code-execution/no-data-modification rules.
+- Added (server): `generateAssistant` proxy in `aiController`, `POST /api/ai/assistant` route (student-only).
+- Added (client): `askAssistant` in `aiService`; `ProjectAssistantPage` (`/project/:id/assistant`) chat UI with suggestion chips, typing indicator, auto-scroll, and retryable error handling; "AI Assistant" card on `ProjectOverviewPage`; route registered (student-only).
+- Verified: FastAPI app + router import OK with `/ai/assistant` registered; server `node --check` + app import OK; frontend production build succeeds.
+- Updated (Phase 8 polish): Added shared `ProjectTabs` nav (Overview / Milestones / Tasks / AI Assistant) rendered on all project pages, and unified the workspace shell — every project page now uses `max-w-6xl` with `space-y-6` spacing (assistant centers its chat column inside), so layout stays consistent across tab switches.
 ```
 
 Keep entries concise.

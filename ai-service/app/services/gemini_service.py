@@ -93,4 +93,65 @@ class GeminiService:
         """
         return self._generate_json(prompt, ProjectBlueprintResponse)
 
+    def _generate_text(self, prompt: str) -> str:
+        """Free-text generation (no JSON schema) for conversational answers."""
+        try:
+            response = self.model.generate_content(prompt)
+            return response.text
+        except Exception as e:
+            print(f"Gemini API Error: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to generate content from AI")
+
+    def generate_assistant(self, data: dict) -> dict:
+        from app.schemas.ai import AssistantRequest
+
+        req = AssistantRequest(**data)
+        ctx = req.context
+
+        context_lines = []
+        if ctx:
+            if ctx.title:
+                context_lines.append(f"Project Title: {ctx.title}")
+            if ctx.description:
+                context_lines.append(f"Description: {ctx.description}")
+            if ctx.domain:
+                context_lines.append(f"Domain: {ctx.domain}")
+            if ctx.technologies:
+                context_lines.append(f"Technologies: {ctx.technologies}")
+            if ctx.features:
+                context_lines.append("Features: " + ", ".join(ctx.features))
+            if ctx.methodology:
+                context_lines.append(f"Methodology: {ctx.methodology}")
+        context_text = "\n".join(context_lines) if context_lines else "No project context provided."
+
+        history_text = ""
+        if req.history:
+            recent = req.history[-6:]  # keep the prompt small
+            turns = [
+                f"{'Student' if m.role == 'user' else 'Assistant'}: {m.content}"
+                for m in recent
+            ]
+            history_text = "Recent conversation:\n" + "\n".join(turns) + "\n\n"
+
+        prompt = f"""
+        You are a helpful technical assistant for a student working on an academic software project.
+        Answer the student's question with clear, practical, step-by-step technical guidance.
+        You may explain technical concepts, suggest APIs, suggest database structures, explain
+        authentication, provide architecture guidance, help debug code snippets, recommend
+        implementation approaches, and answer development questions.
+
+        {context_text}
+
+        {history_text}Student's question: {req.question}
+
+        Rules:
+        - Responses are guidance, not guaranteed correctness — where uncertain, say so.
+        - Never include real secrets, API keys, or credentials.
+        - Do not claim to have modified any project data.
+        - Keep the answer concise and focused on the question.
+        - IMPORTANT: Respond ONLY in English.
+        """
+        answer = self._generate_text(prompt)
+        return {"answer": answer}
+
 gemini_service = GeminiService()

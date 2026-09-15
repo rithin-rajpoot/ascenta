@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -19,6 +19,7 @@ import {
   updateMilestone,
   deleteMilestone,
 } from "../../store/slices/projectSlice";
+import ProjectTabs from "../../components/ProjectTabs";
 
 const STATUSES = ["Pending", "In Progress", "Completed"];
 
@@ -175,7 +176,7 @@ function ProjectMilestonesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <Link
           to={`/project/${id}`}
@@ -195,7 +196,9 @@ function ProjectMilestonesPage() {
         )}
       </div>
 
-      <div className="mt-6">
+      <ProjectTabs id={id} />
+
+      <div>
         <h1 className="flex items-center gap-2 text-2xl font-bold text-text-primary">
           <MilestoneIcon size={24} className="text-primary" />
           Milestones
@@ -203,7 +206,7 @@ function ProjectMilestonesPage() {
         <p className="mt-1 text-text-secondary">{project?.title || "Project"} — development plan</p>
       </div>
 {/* Progress card */}
-      <div className="mt-6 rounded-2xl border border-border bg-surface p-6 shadow-sm">
+      <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <p className="text-sm font-medium text-text-primary">
             <span className="inline-flex items-center gap-1.5">
@@ -234,7 +237,7 @@ function ProjectMilestonesPage() {
       {isManager && formOpen && (
         <form
           onSubmit={handleSubmit}
-          className="mt-6 rounded-2xl border border-primary-light bg-primary-light/10 p-6"
+          className="rounded-2xl border border-primary-light bg-primary-light/10 p-6"
         >
           <div className="flex items-center justify-between">
             <h2 className="font-bold text-text-primary">
@@ -326,7 +329,7 @@ function ProjectMilestonesPage() {
         </form>
       )}
 {/* Milestone list */}
-      <div className="mt-6 space-y-4">
+      <div className="space-y-4">
         {isLoading && milestones.length === 0 ? (
           <div className="flex min-h-[200px] items-center justify-center">
             <Loader2 size={28} className="animate-spin text-primary" />
@@ -337,7 +340,7 @@ function ProjectMilestonesPage() {
             <p className="text-text-secondary">No milestones yet.</p>
             <p className="mt-1 text-sm text-text-muted">
               {isManager
-                ? "Click “Add Milestone” to start planning your project."
+                ? "Click â€œAdd Milestoneâ€ to start planning your project."
                 : "The team leader has not added milestones yet."}
             </p>
           </div>
@@ -413,7 +416,7 @@ function ProjectMilestonesPage() {
               {confirmDeleteId === milestone._id && (
                 <div className="mt-4 rounded-lg border border-error-light bg-error-light p-3">
                   <p className="text-sm text-error">
-                    Delete “{milestone.title}”? This cannot be undone.
+                    Delete â€œ{milestone.title}â€? This cannot be undone.
                   </p>
                   <div className="mt-3 flex gap-2">
                     <button

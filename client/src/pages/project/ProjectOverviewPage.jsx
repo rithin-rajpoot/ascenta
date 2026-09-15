@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Loader2, ArrowLeft, CheckCircle2, Milestone as MilestoneIcon, ListChecks as TaskIcon, GraduationCap, MessageSquare, Star, ArrowRight } from "lucide-react";
+import { Loader2, ArrowLeft, CheckCircle2, Milestone as MilestoneIcon, ListChecks as TaskIcon, GraduationCap, MessageSquare, Star, Sparkles as SparklesIcon, ArrowRight } from "lucide-react";
 import { getProject, getMilestones } from "../../store/slices/projectSlice";
 import { getTasks } from "../../store/slices/taskSlice";
 import { getFacultyList, getProjectReviews, assignFaculty } from "../../store/slices/facultySlice";
+import ProjectTabs from "../../components/ProjectTabs";
 
 function ProjectOverviewPage({ embedded = false }) {
   const { id } = useParams();
@@ -79,15 +80,18 @@ function ProjectOverviewPage({ embedded = false }) {
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6">
       {!embedded && (
-        <Link
-          to="/teams"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-text-primary"
-        >
-          <ArrowLeft size={16} />
-          Back to Dashboard
-        </Link>
+        <>
+          <Link
+            to="/teams"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-text-primary"
+          >
+            <ArrowLeft size={16} />
+            Back to Dashboard
+          </Link>
+          <ProjectTabs id={id} />
+        </>
       )}
 
       <div className="flex flex-col md:flex-row gap-6">
@@ -320,6 +324,25 @@ function ProjectOverviewPage({ embedded = false }) {
               </div>
             </div>
           )}
+
+          <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <h2 className="flex items-center gap-2 text-lg font-bold text-text-primary">
+                <SparklesIcon size={20} className="text-primary" />
+                AI Assistant
+              </h2>
+              <Link
+                to={`/project/${id}/assistant`}
+                className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary-dark"
+              >
+                Open <ArrowRight size={15} />
+              </Link>
+            </div>
+            <p className="mt-3 text-sm text-text-secondary">
+              Ask technical questions about your project — APIs, database design, auth,
+              architecture, debugging. Answers are aware of your blueprint.
+            </p>
+          </div>
 
           <div className="rounded-2xl border border-border bg-surface p-8 shadow-sm">
             <h2 className="text-xl font-bold text-text-primary mb-4">Problem Statement</h2>

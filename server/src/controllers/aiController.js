@@ -28,3 +28,4 @@ export const generateProjectIdeas = (req, res, next) => proxyAiRequest(req, res,
 export const generateProjectFeatures = (req, res, next) => proxyAiRequest(req, res, next, 'project-features');
 export const generateProjectSdgs = (req, res, next) => proxyAiRequest(req, res, next, 'project-sdgs');
 export const generateProjectBlueprint = (req, res, next) => proxyAiRequest(req, res, next, 'project-blueprint');
+export const generateAssistant = (req, res, next) => proxyAiRequest(req, res, next, 'assistant');

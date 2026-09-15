@@ -19,3 +19,9 @@ export const generateProjectBlueprint = async (data) => {
   const { data: res } = await api.post("/ai/project-blueprint", data);
   return res;
 };
+
+// AI Technical Assistant (Phase 8)
+export const askAssistant = async ({ question, history, context }) => {
+  const { data: res } = await api.post("/ai/assistant", { question, history, context });
+  return res;
+};

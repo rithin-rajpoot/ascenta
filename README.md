@@ -199,6 +199,13 @@ Health check: `GET http://localhost:8000/health`
 - Faculty dashboard: stats grid plus per-project progress bars, pending task counts, and feedback counts/last feedback date
 - Backed by `GET /api/dashboard/student` and `GET /api/faculty/dashboard` — computed from actual database state, no extra analytics dependencies
 
+### Integration, Testing & Polish (Phase 12)
+- Stable end-to-end product: register → team → project → ideas/blueprint → milestones → Kanban → faculty review → assistant → notifications → dashboards
+- Global toast notifications with friendly error messages; `PageLoader`, `EmptyState`, `ErrorBoundary`, accessible `ConfirmModal`, and a 404 page
+- Auth client-side validation with inline messages; API safety net (session-expiry re-login, throttled offline toast); `prefers-reduced-motion` support
+- Security review: expired-JWT rejection, role authorization on all routers, server-side AI key, CORS allowlist, 100kb body cap, auth rate limiting, AI proxy timeout
+- Regression suites green: server 9/9 (`node --test tests/`), AI service 8/8 (`python -m unittest discover`), frontend production build succeeds
+
 ### Skipped
 - **Phase 9 — AI Documentation Generator:** deferred by project decision (see `PHASES.md`)
 
@@ -216,5 +223,6 @@ Health check: `GET http://localhost:8000/health`
 - **Phase 9 — AI Documentation Generator:** Skipped (deferred by project decision)
 - **Phase 10 — Notifications:** Completed
 - **Phase 11 — Dashboards & Progress Overview:** Completed
+- **Phase 12 — Integration, Testing & Polish:** Completed
 
 See `PHASES.md` for the full development roadmap.

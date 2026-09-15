@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  Loader2,
   FolderKanban,
   ListChecks,
   Clock,
@@ -13,6 +12,8 @@ import {
   Calendar,
 } from "lucide-react";
 import { fetchStudentDashboard } from "../../store/slices/dashboardSlice";
+import PageLoader from "../../components/PageLoader";
+import EmptyState from "../../components/EmptyState";
 
 const fmtDate = (v) =>
   v
@@ -29,11 +30,7 @@ function StudentDashboardPage() {
   }, [dispatch]);
 
   if (isLoading && !student) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <Loader2 size={32} className="animate-spin text-primary" />
-      </div>
-    );
+    return <PageLoader label="Loading your dashboard…" />;
   }
 
   if (error) {
@@ -99,12 +96,16 @@ function StudentDashboardPage() {
           Your Projects
         </h2>
         {projects.length === 0 ? (
-          <div className="rounded-2xl border border-border bg-surface p-10 text-center shadow-sm">
-            <p className="text-text-secondary">No projects yet.</p>
-            <Link to="/teams" className="mt-3 inline-block text-sm font-medium text-primary hover:underline">
-              Create or join a team to start a project →
-            </Link>
-          </div>
+          <EmptyState
+            icon={FolderKanban}
+            title="No projects yet"
+            description="Create or join a team to start your first project."
+            action={
+              <Link to="/teams" className="text-sm font-medium text-primary hover:underline">
+                Create or join a team →
+              </Link>
+            }
+          />
         ) : (
           projects.map((card) => (
             <Link
@@ -165,9 +166,11 @@ function StudentDashboardPage() {
           Recent Faculty Feedback
         </h2>
         {recentFeedback.length === 0 ? (
-          <p className="rounded-xl border border-border bg-surface p-6 text-sm text-text-muted shadow-sm">
-            No feedback yet. Assign a faculty reviewer from your project page.
-          </p>
+          <EmptyState
+            icon={MessageSquare}
+            title="No feedback yet"
+            description="Assign a faculty reviewer from your project page to get started."
+          />
         ) : (
           <div className="space-y-3">
             {recentFeedback.map((review) => (

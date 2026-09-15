@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Sparkles, ArrowLeft, Loader2, Lightbulb } from "lucide-react";
 import { generateProjectIdeas } from "../../services/aiService";
+import { notifySuccess, notifyErrorFrom } from "../../utils/toast";
 
 function ProjectIdeasPage() {
   const navigate = useNavigate();
@@ -27,9 +28,17 @@ function ProjectIdeasPage() {
     setError(null);
     try {
       const response = await generateProjectIdeas(formData);
-      setIdeas(response.data.ideas || []);
+      const generated = response.data.ideas || [];
+      setIdeas(generated);
+      if (generated.length === 0) {
+        notifyErrorFrom(null, "The AI didn't return any ideas. Try adjusting your inputs.");
+      } else {
+        notifySuccess(`${generated.length} project ideas generated`);
+      }
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to generate ideas. Please try again.");
+      const message = err.response?.data?.message || "Failed to generate ideas. Please try again.";
+      setError(message);
+      notifyErrorFrom(message, "Failed to generate ideas");
     } finally {
       setIsLoading(false);
     }

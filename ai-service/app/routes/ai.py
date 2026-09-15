@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.schemas.ai import (
     ProjectIdeaRequest, ProjectIdeasResponse,
     ProjectFeaturesRequest, ProjectFeaturesResponse,
@@ -6,9 +6,14 @@ from app.schemas.ai import (
     ProjectBlueprintRequest, ProjectBlueprintResponse,
     AssistantRequest, AssistantResponse
 )
+from app.dependencies import require_internal_key
 from app.services.gemini_service import gemini_service
 
-router = APIRouter(prefix="/ai", tags=["AI Integration"])
+router = APIRouter(
+    prefix="/ai",
+    tags=["AI Integration"],
+    dependencies=[Depends(require_internal_key)],
+)
 
 @router.post("/project-ideas")
 async def generate_project_ideas(request: ProjectIdeaRequest):

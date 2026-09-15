@@ -13,6 +13,8 @@ import {
 import { getProject } from "../../store/slices/projectSlice";
 import { askAssistant } from "../../services/aiService";
 import ProjectTabs from "../../components/ProjectTabs";
+import PageLoader from "../../components/PageLoader";
+import { notifyErrorFrom } from "../../utils/toast";
 
 const SUGGESTIONS = [
   "Suggest a database structure for this project",
@@ -75,10 +77,11 @@ function ProjectAssistantPage() {
       if (!answer) throw new Error("Empty response from AI");
       setMessages([...nextMessages, { role: "assistant", content: answer }]);
     } catch (err) {
-      setError(
+      const message =
         err.response?.data?.message ||
-          "The AI assistant is unavailable right now. Please try again in a moment."
-      );
+        "The AI assistant is unavailable right now. Please try again in a moment.";
+      setError(message);
+      notifyErrorFrom(message, "The AI assistant is unavailable right now.");
       // Restore the prior conversation so the question can be retried.
       setMessages(messages);
       setInput(question);
@@ -88,11 +91,7 @@ function ProjectAssistantPage() {
   };
 
   if (projectLoading && !currentProject) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <Loader2 size={32} className="animate-spin text-primary" />
-      </div>
-    );
+    return <PageLoader label="Loading assistant…" />;
   }
 
   if (projectError || !currentProject) {

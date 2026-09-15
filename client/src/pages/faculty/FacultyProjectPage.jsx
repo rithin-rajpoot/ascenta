@@ -1,13 +1,15 @@
 ﻿import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { ArrowLeft, MessageSquare, Star, Loader2 } from "lucide-react";
+import { ArrowLeft, MessageSquare, Star } from "lucide-react";
 import ProjectOverviewPage from "../project/ProjectOverviewPage";
 import {
   getFacultyProjectDetail,
   submitReview,
   getProjectReviews,
 } from "../../store/slices/facultySlice";
+import PageLoader from "../../components/PageLoader";
+import { notifySuccess, notifyErrorFrom } from "../../utils/toast";
 
 // Faculty view of an assigned project: the exact same page students see
 // (embedded, read-only) plus the faculty-only feedback form.
@@ -41,11 +43,14 @@ function FacultyProjectPage() {
       setComment("");
       setRating("");
       setSubmitted(true);
+      notifySuccess("Feedback submitted");
       // Refresh the feedback history shown in the embedded overview.
       dispatch(getProjectReviews(id));
       setTimeout(() => setSubmitted(false), 3000);
     } else {
-      setFormError(result.payload || "Failed to submit feedback");
+      const message = result.payload || "Failed to submit feedback";
+      setFormError(message);
+      notifyErrorFrom(message, "Failed to submit feedback");
     }
   };
 
@@ -61,15 +66,11 @@ function FacultyProjectPage() {
   }
 
   if (isLoading && !currentFacultyProject) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <Loader2 size={32} className="animate-spin text-primary" />
-      </div>
-    );
+    return <PageLoader label="Loading project…" />;
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6">
       <Link
         to="/faculty"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-text-primary"
@@ -78,7 +79,7 @@ function FacultyProjectPage() {
         Back to Faculty Portal
       </Link>
 
-      {/* Full project view â€” same page the students see (read-only for faculty) */}
+      {/* Full project view — same page the students see (read-only for faculty) */}
       <ProjectOverviewPage embedded />
 
       {/* Faculty-only feedback form */}
@@ -117,7 +118,7 @@ function FacultyProjectPage() {
                 <option value="">No rating</option>
                 {[1, 2, 3, 4, 5].map((r) => (
                   <option key={r} value={r}>
-                    {r} â€” {["Poor", "Fair", "Good", "Very Good", "Excellent"][r - 1]}
+                    {r} — {["Poor", "Fair", "Good", "Very Good", "Excellent"][r - 1]}
                   </option>
                 ))}
               </select>

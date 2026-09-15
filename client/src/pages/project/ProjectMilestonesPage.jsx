@@ -20,6 +20,10 @@ import {
   deleteMilestone,
 } from "../../store/slices/projectSlice";
 import ProjectTabs from "../../components/ProjectTabs";
+import PageLoader from "../../components/PageLoader";
+import EmptyState from "../../components/EmptyState";
+import ConfirmModal from "../../components/ConfirmModal";
+import { notifySuccess, notifyErrorFrom } from "../../utils/toast";
 
 const STATUSES = ["Pending", "In Progress", "Completed"];
 
@@ -107,61 +111,73 @@ function ProjectMilestonesPage() {
     e.preventDefault();
     if (!form.title.trim()) return;
 
-    if (editing) {
+    try {
+      if (editing) {
+        await dispatch(
+          updateMilestone({
+            projectId: id,
+            milestoneId: editing._id,
+            data: {
+              title: form.title,
+              description: form.description,
+              deadline: form.deadline || null,
+              status: form.status,
+            },
+          })
+        ).unwrap();
+        notifySuccess("Milestone updated successfully");
+      } else {
+        await dispatch(
+          createMilestone({
+            projectId: id,
+            data: {
+              title: form.title,
+              description: form.description,
+              deadline: form.deadline || null,
+              status: form.status,
+            },
+          })
+        ).unwrap();
+        notifySuccess("Milestone added successfully");
+      }
+      resetForm();
+    } catch (err) {
+      notifyErrorFrom(err, "Failed to save the milestone");
+    }
+  };
+
+  const handleStatusChange = async (milestone, status) => {
+    try {
       await dispatch(
         updateMilestone({
           projectId: id,
-          milestoneId: editing._id,
+          milestoneId: milestone._id,
           data: {
-            title: form.title,
-            description: form.description,
-            deadline: form.deadline || null,
-            status: form.status,
+            title: milestone.title,
+            description: milestone.description || "",
+            deadline: milestone.deadline || null,
+            status,
           },
         })
-      );
-    } else {
-      await dispatch(
-        createMilestone({
-          projectId: id,
-          data: {
-            title: form.title,
-            description: form.description,
-            deadline: form.deadline || null,
-            status: form.status,
-          },
-        })
-      );
+      ).unwrap();
+      notifySuccess(`"${milestone.title}" marked as ${status}`, { duration: 2500 });
+    } catch (err) {
+      notifyErrorFrom(err, "Failed to update the milestone status");
     }
-    resetForm();
-  };
-
-  const handleStatusChange = (milestone, status) => {
-    dispatch(
-      updateMilestone({
-        projectId: id,
-        milestoneId: milestone._id,
-        data: {
-          title: milestone.title,
-          description: milestone.description || "",
-          deadline: milestone.deadline || null,
-          status,
-        },
-      })
-    );
   };
 
   const handleDelete = async (milestoneId) => {
-    await dispatch(deleteMilestone({ projectId: id, milestoneId }));
+    try {
+      await dispatch(deleteMilestone({ projectId: id, milestoneId })).unwrap();
+      notifySuccess("Milestone deleted");
+    } catch (err) {
+      notifyErrorFrom(err, "Failed to delete the milestone");
+    }
     setConfirmDeleteId(null);
   };
 
   if (!project && isLoading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <Loader2 size={32} className="animate-spin text-primary" />
-      </div>
-    );
+    return <PageLoader label="Loading milestones…" />;
   }
 
   if (error && !project) {
@@ -331,19 +347,17 @@ function ProjectMilestonesPage() {
 {/* Milestone list */}
       <div className="space-y-4">
         {isLoading && milestones.length === 0 ? (
-          <div className="flex min-h-[200px] items-center justify-center">
-            <Loader2 size={28} className="animate-spin text-primary" />
-          </div>
+          <PageLoader minHeight="200px" label="Loading milestones…" />
         ) : milestones.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border bg-surface p-10 text-center">
-            <MilestoneIcon size={32} className="mx-auto mb-3 text-text-muted" />
-            <p className="text-text-secondary">No milestones yet.</p>
-            <p className="mt-1 text-sm text-text-muted">
-              {isManager
-                ? "Click â€œAdd Milestoneâ€ to start planning your project."
-                : "The team leader has not added milestones yet."}
-            </p>
-          </div>
+          <EmptyState
+            icon={MilestoneIcon}
+            title="No milestones yet"
+            description={
+              isManager
+                ? "Click “Add Milestone” to start planning your project."
+                : "The team leader has not added milestones yet."
+            }
+          />
         ) : (
           milestones.map((milestone, idx) => (
             <div
@@ -412,32 +426,22 @@ function ProjectMilestonesPage() {
                   </p>
                 )}
               </div>
-
-              {confirmDeleteId === milestone._id && (
-                <div className="mt-4 rounded-lg border border-error-light bg-error-light p-3">
-                  <p className="text-sm text-error">
-                    Delete â€œ{milestone.title}â€? This cannot be undone.
-                  </p>
-                  <div className="mt-3 flex gap-2">
-                    <button
-                      onClick={() => handleDelete(milestone._id)}
-                      className="rounded-lg bg-error px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
-                    >
-                      Delete
-                    </button>
-                    <button
-                      onClick={() => setConfirmDeleteId(null)}
-                      className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-medium text-text-primary hover:bg-background"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           ))
         )}
       </div>
+
+      <ConfirmModal
+        open={!!confirmDeleteId}
+        title="Delete milestone"
+        message={`Delete “${
+          milestones.find((m) => String(m._id) === String(confirmDeleteId))?.title || "this milestone"
+        }”? This cannot be undone.`}
+        confirmLabel="Delete"
+        isLoading={isLoading}
+        onConfirm={() => handleDelete(confirmDeleteId)}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
     </div>
   );
 }

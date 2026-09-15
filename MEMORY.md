@@ -92,17 +92,19 @@ The Gemini API key must remain inside the FastAPI service and must never be expo
 
 ## Overall Status
 
-**Phase 11 — Dashboards & Progress Overview is complete. Phase 9 — AI Documentation Generator remains SKIPPED (deferred by project decision).**
+**Phase 12 — Integration, Testing & Polish is complete. All MVP phases (0–8, 10–12) are done; Phase 9 — AI Documentation Generator remains SKIPPED (deferred by project decision).**
+
+Regression suites are green (server 9/9, AI service 8/8), the frontend production build succeeds, and the app has global toasts, shared loading/empty/error states, accessible confirmation modals, auth client-side validation, a 404 page, and the reviewed security posture (expired-JWT rejection, role authorization, CORS allowlist, body cap, auth rate limiting, AI key server-side only).
 
 Students get a `/dashboard` page (nav link) with stat cards, per-project progress cards (milestone/task counts, pending & own tasks, next deadline), and recent faculty feedback. Faculty get the same stats treatment on their portal (progress bars, pending tasks, feedback counts per assigned project). Both are served by aggregation endpoints (`GET /api/dashboard/student`, `GET /api/faculty/dashboard`) computed from real database state with simple metrics only.
 
 ## Current Phase
 
-**Phase 11 — Dashboards & Progress Overview (COMPLETED) · Phase 9 SKIPPED**
+**Phase 12 — Integration, Testing & Polish (COMPLETED) · Phase 9 SKIPPED**
 
 ## Current Task
 
-Phase 11 is complete and ready to commit/push. Remaining: Phase 12 — Integration, Testing & Polish.
+Phase 12 is complete and ready to commit/push. Remaining: Phase 13 — Deployment & Final Release.
 
 ---
 
@@ -767,6 +769,14 @@ Use this section for major completed changes.
 - Added (client): `dashboardService` API client, `dashboardSlice`, `StudentDashboardPage` (`/dashboard` — stat cards, project progress cards, recent feedback), route registered, student "Dashboard" nav link in `MainLayout`.
 - Updated: `FacultyDashboardPage` now uses the dashboard endpoint — stats grid + per-project progress bars, pending tasks, feedback counts.
 - Verified: server `node --check` + app import OK; frontend production build succeeds.
+### 2026-09-07 — Phase 12: Integration, Testing & Polish
+
+- Added (client): global `react-hot-toast` (`App.jsx` Toaster + `utils/toast.js` helpers with friendly fallback messages), shared `PageLoader`/`EmptyState`/`ErrorBoundary`/`ConfirmModal` (Escape/backdrop close, focus trap, `aria-modal`), `NotFoundPage` + catch-all `*` route, auth client-side validation (email format, required fields, inline `aria-invalid` errors), API safety net in `services/api.js` (401 → session-expired toast + re-login, offline → single throttled toast).
+- Added (server): `middleware/rateLimiter.js` (30 req/15min on `/api/auth`), `express.json`/`urlencoded` 100kb body caps, `trust proxy` for hosting, `TokenExpiredError` → 401 "Session expired" in `authMiddleware`; `.env.example` documents `FRONTEND_URL`; `aiController` proxy timeout (60s) with friendly AI-unavailable errors.
+- Added (ai-service): `dependencies.py` (`verify_api_key` for service-to-service auth), settings `AI_SERVICE_API_KEY`, `main.py` guards (docs disabled in prod, API-key gate on `/ai/*`), `gemini_service` fail-fast when `GEMINI_API_KEY` is missing; `tests/test_regression.py` (8 tests: health, schemas, assistant context/history, mocked generation).
+- Added (server tests): `tests/regression.test.js` (9 tests: `normalizeProjectData` arrays/whitespace/coercion, `generateInviteCode` format/uniqueness/charset) — runs with `node --test tests/`, zero new dependencies.
+- Accessibility: `prefers-reduced-motion` guard in `index.css` stops spinners/marquee/menu animations; form fields use `aria-invalid` + inline errors; alerts use `role="alert"`.
+- Verified: server 9/9 pass, AI service 8/8 pass, frontend production build succeeds, both backend apps import cleanly.
 ```
 
 Keep entries concise.

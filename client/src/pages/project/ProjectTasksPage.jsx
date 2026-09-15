@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  Loader2,
   ArrowLeft,
   Plus,
   ListChecks,
@@ -20,6 +19,10 @@ import {
   deleteTask,
 } from "../../store/slices/taskSlice";
 import ProjectTabs from "../../components/ProjectTabs";
+import PageLoader from "../../components/PageLoader";
+import EmptyState from "../../components/EmptyState";
+import ConfirmModal from "../../components/ConfirmModal";
+import { notifySuccess, notifyErrorFrom } from "../../utils/toast";
 
 const COLUMNS = ["Todo", "In Progress", "Review", "Completed"];
 const PRIORITIES = ["Low", "Medium", "High"];
@@ -163,19 +166,39 @@ function ProjectTasksPage() {
       : await dispatch(createTask({ projectId: id, data }));
 
     if (result.meta.requestStatus === "fulfilled") {
+      notifySuccess(editing ? "Task updated successfully" : "Task created successfully");
       resetForm();
     } else {
-      setFormError(result.payload || "Something went wrong");
+      const message = result.payload || "Something went wrong";
+      setFormError(message);
+      notifyErrorFrom(message, "Failed to save the task");
+    }
+  };
+
+  const applyStatusChange = async (task, status) => {
+    const result = await dispatch(
+      updateTask({ projectId: id, taskId: task._id, data: { status } })
+    );
+
+    if (result.meta.requestStatus === "fulfilled") {
+      notifySuccess(`"${task.title}" moved to ${status}`, { duration: 2500 });
+    } else {
+      notifyErrorFrom(result.payload, "Failed to move the task");
     }
   };
 
   const handleStatusChange = async (task, status) => {
     if (status === task.status) return;
-    await dispatch(updateTask({ projectId: id, taskId: task._id, data: { status } }));
+    await applyStatusChange(task, status);
   };
 
   const handleDelete = async (taskId) => {
-    await dispatch(deleteTask({ projectId: id, taskId }));
+    const result = await dispatch(deleteTask({ projectId: id, taskId }));
+    if (result.meta.requestStatus === "fulfilled") {
+      notifySuccess("Task deleted");
+    } else {
+      notifyErrorFrom(result.payload, "Failed to delete the task");
+    }
     setConfirmDeleteId(null);
   };
 
@@ -188,7 +211,7 @@ function ProjectTasksPage() {
     const task = tasks.find((t) => t._id === draggedId);
     setDraggedId(null);
     if (!task || task.status === status || !canMoveTask(task)) return;
-    await dispatch(updateTask({ projectId: id, taskId: task._id, data: { status } }));
+    await applyStatusChange(task, status);
   };
 
   const filteredTasks = tasks.filter(
@@ -200,11 +223,7 @@ function ProjectTasksPage() {
   );
 
   if (projectLoading && !project) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <Loader2 size={32} className="animate-spin text-primary" />
-      </div>
-    );
+    return <PageLoader label="Loading task board…" />;
   }
 
   if (projectError || !project) {
@@ -419,13 +438,13 @@ function ProjectTasksPage() {
 
               <div className="space-y-3">
                 {tasksLoading && !tasks.length ? (
-                  <div className="flex justify-center py-6">
-                    <Loader2 size={20} className="animate-spin text-primary" />
-                  </div>
+                  <PageLoader minHeight="120px" label="Loading tasks…" />
                 ) : colTasks.length === 0 ? (
-                  <p className="py-6 text-center text-xs text-text-muted">
-                    {isManager ? "Drop tasks here" : "No tasks"}
-                  </p>
+                  <EmptyState
+                    compact
+                    icon={ListChecks}
+                    description={isManager ? "Drop tasks here" : "No tasks"}
+                  />
                 ) : (
                   colTasks.map((task) => {
                     return (
@@ -495,26 +514,6 @@ function ProjectTasksPage() {
                             ))}
                           </select>
                         )}
-
-                        {confirmDeleteId === task._id && (
-                          <div className="mt-2 rounded-md border border-error-light bg-error-light p-2">
-                            <p className="text-xs text-error">Delete this task?</p>
-                            <div className="mt-2 flex gap-2">
-                              <button
-                                onClick={() => handleDelete(task._id)}
-                                className="rounded-md bg-error px-2 py-1 text-xs font-medium text-white hover:opacity-90"
-                              >
-                                Delete
-                              </button>
-                              <button
-                                onClick={() => setConfirmDeleteId(null)}
-                                className="rounded-md border border-border bg-surface px-2 py-1 text-xs font-medium text-text-primary hover:bg-background"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     );
                   })
@@ -524,6 +523,18 @@ function ProjectTasksPage() {
           );
         })}
       </div>
+
+      <ConfirmModal
+        open={!!confirmDeleteId}
+        title="Delete task"
+        message={`Delete “${
+          tasks.find((t) => String(t._id) === String(confirmDeleteId))?.title || "this task"
+        }”? This cannot be undone.`}
+        confirmLabel="Delete"
+        isLoading={tasksLoading}
+        onConfirm={() => handleDelete(confirmDeleteId)}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
     </div>
   );
 }

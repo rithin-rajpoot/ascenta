@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { UserPlus, ArrowLeft, Hash } from "lucide-react";
 import { joinTeamByCode, clearError } from "../../store/slices/teamSlice";
+import { notifySuccess, notifyErrorFrom } from "../../utils/toast";
 
 function JoinTeamPage() {
   const [inviteCode, setInviteCode] = useState("");
@@ -16,7 +17,10 @@ function JoinTeamPage() {
     const code = inviteCode.trim().toUpperCase();
     dispatch(joinTeamByCode(code)).then((action) => {
       if (action.type === "team/joinByCode/fulfilled") {
+        notifySuccess("You've joined the team");
         navigate(`/team/${action.payload._id}`);
+      } else {
+        notifyErrorFrom(action.payload, "Failed to join the team");
       }
     });
   };

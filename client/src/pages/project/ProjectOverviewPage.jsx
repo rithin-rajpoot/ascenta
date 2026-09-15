@@ -5,6 +5,8 @@ import { Loader2, ArrowLeft, CheckCircle2, Milestone as MilestoneIcon, ListCheck
 import { getProject, getMilestones } from "../../store/slices/projectSlice";
 import { getTasks } from "../../store/slices/taskSlice";
 import { getFacultyList, getProjectReviews, assignFaculty } from "../../store/slices/facultySlice";
+import { notifySuccess, notifyErrorFrom } from "../../utils/toast";
+import PageLoader from "../../components/PageLoader";
 import ProjectTabs from "../../components/ProjectTabs";
 
 function ProjectOverviewPage({ embedded = false }) {
@@ -54,18 +56,17 @@ function ProjectOverviewPage({ embedded = false }) {
     setIsAssigning(false);
     if (result.meta.requestStatus === "fulfilled") {
       // currentProject is updated live via the projectSlice listener — no refresh needed.
+      notifySuccess("Faculty reviewer assigned successfully");
       setAssignOpen(false);
     } else {
-      setAssignError(result.payload || "Failed to assign faculty");
+      const message = result.payload || "Failed to assign faculty";
+      setAssignError(message);
+      notifyErrorFrom(message, "Failed to assign faculty");
     }
   };
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <Loader2 size={32} className="animate-spin text-primary" />
-      </div>
-    );
+    return <PageLoader label="Loading project…" />;
   }
 
   if (error || !currentProject) {

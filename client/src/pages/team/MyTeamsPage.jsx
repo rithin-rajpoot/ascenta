@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Users, Plus } from "lucide-react";
 import { getMyTeams } from "../../store/slices/teamSlice";
+import PageLoader from "../../components/PageLoader";
+import EmptyState from "../../components/EmptyState";
 
 function MyTeamsPage() {
   const dispatch = useDispatch();
@@ -13,11 +15,7 @@ function MyTeamsPage() {
   }, [dispatch]);
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <p className="text-text-secondary">Loading teams...</p>
-      </div>
-    );
+    return <PageLoader label="Loading your teams…" />;
   }
 
   return (
@@ -35,23 +33,19 @@ function MyTeamsPage() {
 
       <div className="mt-8">
         {!myTeams || myTeams.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border p-12 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-surface shadow-sm">
-              <Users size={24} className="text-text-muted" />
-            </div>
-            <h3 className="mt-4 text-lg font-semibold text-text-primary">
-              No teams yet
-            </h3>
-            <p className="mt-2 text-sm text-text-secondary">
-              Start your academic project journey by creating a new team or joining an existing one.
-            </p>
-            <Link
-              to="/team/setup"
-              className="mt-6 inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:bg-background"
-            >
-              Get Started
-            </Link>
-          </div>
+          <EmptyState
+            icon={Users}
+            title="No teams yet"
+            description="Start your academic project journey by creating a new team or joining an existing one."
+            action={
+              <Link
+                to="/team/setup"
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:bg-background"
+              >
+                Get Started
+              </Link>
+            }
+          />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {myTeams.map((team) => (

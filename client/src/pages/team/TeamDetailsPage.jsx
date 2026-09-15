@@ -10,6 +10,8 @@ import {
   clearTeam,
 } from "../../store/slices/teamSlice";
 import { getTeamProjects } from "../../store/slices/projectSlice";
+import ConfirmModal from "../../components/ConfirmModal";
+import { notifySuccess, notifyErrorFrom } from "../../utils/toast";
 
 function TeamDetailsPage() {
   const { id } = useParams();
@@ -22,6 +24,7 @@ function TeamDetailsPage() {
   const [formError, setFormError] = useState("");
   const [inviting, setInviting] = useState(false);
   const [removingId, setRemovingId] = useState(null);
+  const [confirmRemoveId, setConfirmRemoveId] = useState(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -73,21 +76,27 @@ function TeamDetailsPage() {
     if (action.type === "team/invite/fulfilled") {
       setInviteUserId("");
       setNotice("Member invited successfully.");
+      notifySuccess("Member invited successfully");
+    } else {
+      notifyErrorFrom(action.payload, "Failed to invite the member");
     }
   };
 
   const handleRemove = async (userId) => {
-    if (removingId) return;
-    if (!window.confirm("Remove this member from the team?")) return;
+    if (removingId || !userId) return;
 
     dispatch(clearError());
     setNotice("");
     setRemovingId(userId);
     const action = await dispatch(removeMember({ teamId: id, userId }));
     setRemovingId(null);
+    setConfirmRemoveId(null);
 
     if (action.type === "team/removeMember/fulfilled") {
       setNotice("Member removed from the team.");
+      notifySuccess("Member removed from the team");
+    } else {
+      notifyErrorFrom(action.payload, "Failed to remove the member");
     }
   };
 
@@ -360,9 +369,10 @@ function TeamDetailsPage() {
                 </div>
                 {isLeader && member._id !== team.leader?._id && (
                   <button
-                    onClick={() => handleRemove(member._id)}
+                    onClick={() => setConfirmRemoveId(member._id)}
                     disabled={removingId === member._id}
                     className="rounded-lg p-2 text-text-muted transition-colors hover:bg-error-light hover:text-error disabled:cursor-not-allowed disabled:opacity-50"
+                    aria-label={`Remove ${member.name} from the team`}
                     title={removingId === member._id ? "Removing..." : "Remove member"}
                   >
                     {removingId === member._id ? (
@@ -410,6 +420,23 @@ function TeamDetailsPage() {
           </form>
         )}
       </div>
+
+      <ConfirmModal
+        open={!!confirmRemoveId}
+        title="Remove team member"
+        message={
+          confirmRemoveId
+            ? `${
+                team?.members?.find((m) => m._id === confirmRemoveId)?.name ||
+                "This member"
+              } will be removed from the team and will lose access to its projects.`
+            : ""
+        }
+        confirmLabel="Remove"
+        isLoading={!!removingId}
+        onConfirm={() => handleRemove(confirmRemoveId)}
+        onCancel={() => setConfirmRemoveId(null)}
+      />
     </div>
   );
 }

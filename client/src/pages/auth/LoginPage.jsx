@@ -3,9 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { LogIn, User, BookOpen } from "lucide-react";
 import { loginUser, clearError } from "../../store/slices/authSlice";
+import { notifySuccess, notifyErrorFrom } from "../../utils/toast";
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "", role: "student" });
+  const [fieldErrors, setFieldErrors] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isLoading, error, user } = useSelector((state) => state.auth);
@@ -15,13 +19,37 @@ function LoginPage() {
     dispatch(clearError());
   }, [user, navigate, dispatch]);
 
-  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const onChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    if (fieldErrors[e.target.name]) {
+      setFieldErrors((prev) => ({ ...prev, [e.target.name]: undefined }));
+    }
+  };
   
   const handleRoleChange = (role) => setForm({ ...form, role });
 
+  const validate = () => {
+    const errors = {};
+    const email = form.email.trim();
+    if (!email) errors.email = "Email is required.";
+    else if (!EMAIL_PATTERN.test(email)) errors.email = "Enter a valid email address.";
+    if (!form.password) errors.password = "Password is required.";
+    return errors;
+  };
+
   const onSubmit = (e) => {
     e.preventDefault();
-    dispatch(loginUser(form));
+    const errors = validate();
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
+    dispatch(loginUser({ ...form, email: form.email.trim() })).then((action) => {
+      if (action.type === "auth/login/fulfilled") {
+        notifySuccess("Welcome back!");
+      } else {
+        notifyErrorFrom(action.payload, "Sign in failed");
+      }
+    });
   };
 
   return (
@@ -40,12 +68,15 @@ function LoginPage() {
         </div>
 
         {error && (
-          <div className="mt-4 rounded-lg border border-error bg-error-light px-4 py-2 text-sm text-error">
+          <div
+            role="alert"
+            className="mt-4 rounded-lg border border-error bg-error-light px-4 py-2 text-sm text-error"
+          >
             {error}
           </div>
         )}
 
-        <form onSubmit={onSubmit} className="mt-6 space-y-4">
+        <form onSubmit={onSubmit} noValidate className="mt-6 space-y-4">
           <div className="grid grid-cols-2 gap-3 mb-2">
             <button
               type="button"
@@ -84,8 +115,14 @@ function LoginPage() {
               onChange={onChange}
               required
               placeholder="you@example.com"
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
+              aria-invalid={fieldErrors.email ? "true" : undefined}
+              className={`mt-1 w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none ${
+                fieldErrors.email ? "border-error focus:border-error" : "border-border focus:border-primary"
+              }`}
             />
+            {fieldErrors.email && (
+              <p className="mt-1 text-xs text-error">{fieldErrors.email}</p>
+            )}
           </div>
 
           <div>
@@ -99,8 +136,14 @@ function LoginPage() {
               onChange={onChange}
               required
               placeholder="••••••••"
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none"
+              aria-invalid={fieldErrors.password ? "true" : undefined}
+              className={`mt-1 w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none ${
+                fieldErrors.password ? "border-error focus:border-error" : "border-border focus:border-primary"
+              }`}
             />
+            {fieldErrors.password && (
+              <p className="mt-1 text-xs text-error">{fieldErrors.password}</p>
+            )}
           </div>
 
           <button

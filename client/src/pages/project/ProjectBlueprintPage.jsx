@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Sparkles, ArrowLeft, Loader2, Save } from "lucide-react";
 import { generateProjectFeatures, generateProjectSdgs, generateProjectBlueprint } from "../../services/aiService";
 import { createProject } from "../../store/slices/projectSlice";
+import { notifySuccess, notifyErrorFrom } from "../../utils/toast";
 
 function ProjectBlueprintPage() {
   const location = useLocation();
@@ -55,8 +56,11 @@ function ProjectBlueprintPage() {
         ...(res.data.optionalFeatures || []).map(f => ({ name: f, isCore: false }))
       ];
       setFormData(prev => ({ ...prev, features: aiFeatures }));
+      notifySuccess(`Suggested ${aiFeatures.length} features`);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to generate features");
+      const message = err.response?.data?.message || "Failed to generate features";
+      setError(message);
+      notifyErrorFrom(message, "Failed to generate features");
     } finally {
       setAiLoading(prev => ({ ...prev, features: false }));
     }
@@ -71,8 +75,11 @@ function ProjectBlueprintPage() {
         description: formData.description,
       });
       setFormData(prev => ({ ...prev, sdgs: res.data.sdgs || [] }));
+      notifySuccess("SDG mapping suggested");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to generate SDGs");
+      const message = err.response?.data?.message || "Failed to generate SDGs";
+      setError(message);
+      notifyErrorFrom(message, "Failed to generate SDGs");
     } finally {
       setAiLoading(prev => ({ ...prev, sdgs: false }));
     }
@@ -125,9 +132,12 @@ function ProjectBlueprintPage() {
           sdgs: toArray(bp.sdgs),
         };
       });
+      notifySuccess("Blueprint generated. Review the sections below.");
     } catch (err) {
       console.error("[Blueprint] Error:", err);
-      setError(err.response?.data?.message || err.message || "Failed to generate blueprint");
+      const message = err.response?.data?.message || err.message || "Failed to generate blueprint";
+      setError(message);
+      notifyErrorFrom(message, "Failed to generate blueprint");
     } finally {
       setAiLoading(prev => ({ ...prev, blueprint: false }));
     }
@@ -136,6 +146,7 @@ function ProjectBlueprintPage() {
   const handleSave = async () => {
     if (!formData.title || !formData.description) {
       setError("Title and description are required.");
+      notifyErrorFrom("Please add a project title and description before saving.");
       return;
     }
 
@@ -151,12 +162,15 @@ function ProjectBlueprintPage() {
 
       const resultAction = await dispatch(createProject(projectData));
       if (createProject.fulfilled.match(resultAction)) {
+        notifySuccess("Project created successfully");
         navigate(`/project/${resultAction.payload._id}`);
       } else {
         setError(resultAction.payload);
+        notifyErrorFrom(resultAction.payload, "Failed to save the project");
       }
     } catch (err) {
       setError("Failed to save project.");
+      notifyErrorFrom(err, "Failed to save the project");
     }
   };
 

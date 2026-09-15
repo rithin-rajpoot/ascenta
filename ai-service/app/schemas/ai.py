@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 
 class ProjectIdeaRequest(BaseModel):
@@ -80,7 +80,8 @@ class AssistantMessage(BaseModel):
 
 
 class AssistantRequest(BaseModel):
-    question: str
+    # Empty question must fail fast at validation (never waste an AI call).
+    question: str = Field(min_length=1)
     history: Optional[List[AssistantMessage]] = None
     context: Optional[AssistantContext] = None
 

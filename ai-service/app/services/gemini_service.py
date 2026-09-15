@@ -10,14 +10,24 @@ load_dotenv()
 class GeminiService:
     def __init__(self):
         api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
+        self.configured = bool(api_key)
+        if not self.configured:
             print("WARNING: GEMINI_API_KEY not set")
         else:
             genai.configure(api_key=api_key)
         
         self.model = genai.GenerativeModel("gemini-3.6-flash")
 
+    def _ensure_configured(self) -> None:
+        """Fail clearly (and without leaking the key) when AI is not configured."""
+        if not self.configured:
+            raise HTTPException(
+                status_code=503,
+                detail="AI service is not configured. Please contact the administrator.",
+            )
+
     def _generate_json(self, prompt: str, schema: BaseModel) -> dict:
+        self._ensure_configured()
         try:
             response = self.model.generate_content(
                 prompt,
@@ -95,6 +105,7 @@ class GeminiService:
 
     def _generate_text(self, prompt: str) -> str:
         """Free-text generation (no JSON schema) for conversational answers."""
+        self._ensure_configured()
         try:
             response = self.model.generate_content(prompt)
             return response.text

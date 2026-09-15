@@ -1,17 +1,27 @@
 import { config } from "../config/env.js";
 import axios from "axios";
 
+const isDev = config.nodeEnv !== "production";
+
 export const proxyAiRequest = async (req, res, next, endpoint) => {
   try {
-    console.log(`[AI Proxy] Calling: ${config.aiServiceUrl}/ai/${endpoint}`);
-    console.log(`[AI Proxy] Request body:`, JSON.stringify(req.body));
+    if (isDev) {
+      console.log(`[AI Proxy] Calling: ${config.aiServiceUrl}/ai/${endpoint}`);
+    }
+
+    const headers = { "Content-Type": "application/json" };
+    // The AI service is internal: prove we're the backend when a key is configured.
+    if (config.aiServiceKey) {
+      headers["X-Internal-Key"] = config.aiServiceKey;
+    }
+
     const aiResponse = await axios.post(`${config.aiServiceUrl}/ai/${endpoint}`, req.body, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      headers,
     });
-    console.log(`[AI Proxy] Response status:`, aiResponse.status);
-    console.log(`[AI Proxy] Response data:`, JSON.stringify(aiResponse.data).substring(0, 500));
+
+    if (isDev) {
+      console.log(`[AI Proxy] Response status:`, aiResponse.status);
+    }
     res.status(200).json(aiResponse.data);
   } catch (error) {
     console.error(`[AI Proxy] Error:`, error.message);

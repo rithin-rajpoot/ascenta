@@ -1,9 +1,10 @@
-﻿import { Routes, Route, Navigate } from "react-router-dom";
+﻿import { Routes, Route } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import AuthLayout from "../layouts/AuthLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
 import HomePage from "../pages/HomePage";
 import AboutPage from "../pages/AboutPage";
+import NotFoundPage from "../pages/NotFoundPage";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import ProfilePage from "../pages/ProfilePage";
@@ -159,7 +160,7 @@ function AppRoutes() {
         />
 
         {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
 
       <Route element={<AuthLayout />}>

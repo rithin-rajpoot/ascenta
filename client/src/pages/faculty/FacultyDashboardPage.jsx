@@ -1,8 +1,10 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Loader2, GraduationCap, ArrowRight, Users, Star, Clock, TrendingUp, FolderKanban } from "lucide-react";
+import { GraduationCap, ArrowRight, Users, Star, Clock, TrendingUp, FolderKanban } from "lucide-react";
 import { fetchFacultyDashboard } from "../../store/slices/dashboardSlice";
+import PageLoader from "../../components/PageLoader";
+import EmptyState from "../../components/EmptyState";
 
 const fmtDate = (v) =>
   v
@@ -30,7 +32,7 @@ function FacultyDashboardPage() {
   }, [dispatch]);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex items-center gap-3">
         <GraduationCap size={26} className="text-primary" />
         <div>
@@ -57,16 +59,13 @@ function FacultyDashboardPage() {
       </div>
 
       {isLoading && !faculty ? (
-        <div className="flex min-h-[300px] items-center justify-center">
-          <Loader2 size={30} className="animate-spin text-primary" />
-        </div>
+        <PageLoader minHeight="300px" label="Loading assigned projects…" />
       ) : !faculty || faculty.projects.length === 0 ? (
-        <div className="rounded-2xl border border-border bg-surface p-10 text-center shadow-sm">
-          <p className="text-text-secondary">No projects assigned to you yet.</p>
-          <p className="mt-1 text-sm text-text-muted">
-            Students invite their team leader to assign a faculty reviewer from the project page.
-          </p>
-        </div>
+        <EmptyState
+          icon={GraduationCap}
+          title="No projects assigned to you yet"
+          description="Students invite their team leader to assign a faculty reviewer from the project page."
+        />
       ) : (
         <div className="space-y-4">
           {faculty.projects.map((card) => {

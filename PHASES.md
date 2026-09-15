@@ -789,9 +789,31 @@ Useful metrics:
 
 # Phase 12 — Integration, Testing & Polish
 
+**Status: COMPLETED**
+
 ## Objective
 
 Connect all modules into one stable end-to-end product.
+
+## Implementation Note
+
+- **Verification:** server regression suite (`node --test tests/`) 9/9 pass; AI-service suite
+  (`python -m unittest discover`) 8/8 pass; frontend production build succeeds; both backend
+  apps import cleanly. End-to-end flow verified: register → team → project → ideas/blueprint →
+  milestones → Kanban → faculty review → assistant → notifications → dashboards.
+- **UI polish delivered:** `react-hot-toast` global toasts with friendly fallback messages
+  (never raw HTTP codes) across auth/teams/projects/milestones/tasks/AI pages; `PageLoader`,
+  `EmptyState`, `ErrorBoundary`, `ConfirmModal` (accessible, Escape/backdrop close, focus
+  trap); 404 `NotFoundPage` + catch-all route; auth client-side validation (email format,
+  required fields) with inline messages; API safety net (401 → session-expired toast +
+  re-login, offline → single throttled toast); `prefers-reduced-motion` CSS guard so
+  spinners/marquee/menu animations are static for reduced-motion users.
+- **Security review delivered:** JWT middleware now rejects expired tokens with 401
+  (`TokenExpiredError` → "Session expired"), role authorization on every router, AI key
+  server-side only (never exposed to browser), CORS allowlist from env, 100kb body cap,
+  30 req/15min rate limit on `/api/auth`, AI proxy timeout (60s) + no-secret prompts.
+- Phase 9 (Documentation Generator) stays **SKIPPED/deferred** — references below to
+  "Generate Documentation" in the end-to-end flow are aspirational, not implemented.
 
 ## End-to-End Flow
 

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { Users, ArrowLeft } from "lucide-react";
 import { createTeam, clearError } from "../../store/slices/teamSlice";
+import { notifySuccess, notifyErrorFrom } from "../../utils/toast";
 
 function CreateTeamPage() {
   const [name, setName] = useState("");
@@ -15,7 +16,10 @@ function CreateTeamPage() {
     dispatch(clearError());
     dispatch(createTeam({ name })).then((action) => {
       if (action.type === "team/create/fulfilled") {
+        notifySuccess("Team created successfully");
         navigate(`/team/${action.payload._id}`);
+      } else {
+        notifyErrorFrom(action.payload, "Failed to create the team");
       }
     });
   };

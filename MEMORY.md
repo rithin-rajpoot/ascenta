@@ -92,17 +92,17 @@ The Gemini API key must remain inside the FastAPI service and must never be expo
 
 ## Overall Status
 
-**Phase 6 — Task Management / Kanban Board is complete.**
+**Phase 7 — Faculty Review Portal is complete.**
 
-Teams can manage day-to-day project work on a four-column Kanban board (Todo / In Progress / Review / Completed). The project owner or team leader creates, assigns (leader + members), edits, and deletes tasks with priority and due dates; assignees can update only the status of their own tasks. Tasks move via drag-and-drop or a "Move to" dropdown, with assignee/priority filters. Task progress is reflected in the project workspace.
+Students (project owner/team leader) assign a faculty reviewer to their project. Faculty get a portal at `/faculty` listing assigned projects, with a project detail view showing team members and milestone/task progress. Faculty submit feedback (comment + optional 1–5 rating) stored in `FacultyReview`; students see the feedback history (read-only) on the project overview. Students have no write access to feedback.
 
 ## Current Phase
 
-**Phase 6 — Task Management / Kanban Board (COMPLETED)**
+**Phase 7 — Faculty Review Portal (COMPLETED)**
 
 ## Current Task
 
-Phase 6 — Task Management / Kanban Board is complete and ready to commit/push. Phase 7 — Faculty Review Portal has not yet started.
+Phase 7 — Faculty Review Portal is complete and ready to commit/push. Phase 8 — AI Technical Assistant has not yet started.
 
 ---
 
@@ -733,6 +733,16 @@ Use this section for major completed changes.
 - Added: `taskService` API client, `taskSlice` (thunks + reducers), and store registration.
 - Updated: `projectService.getProjectById` now populates team `leader` and `members` (name, email) for assignment dropdowns; `ProjectOverviewPage` shows a Tasks progress card with "Open Board" link.
 - Verified: Server `node --check` passes on all modified files and route import succeeds; frontend production build succeeds.
+### 2026-09-06 — Phase 7: Faculty Review Portal
+
+- Added: `FacultyReview` model (project, faculty, comment required, optional 1–5 rating) and `assignedFaculty` field on `Project`.
+- Added: `facultyService`, `facultyController`, and `facultyRoutes` mounted at `/api/faculty` — `GET /` faculty list, `GET /projects` + `GET /projects/:projectId` (faculty-only, own assignments; detail includes project, team, milestones, tasks), `POST/GET /projects/:projectId/reviews`, `POST /projects/:projectId/assign` (owner/leader only, faculty validated).
+- Added: `FacultyDashboardPage` (`/faculty`) and `FacultyProjectPage` (`/faculty/project/:id`) with team, milestone/task progress, feedback form (comment + rating), and feedback history; faculty nav link now points to `/faculty`.
+- Added: `facultyService` API client and `facultySlice` (thunks + reducers); store registration.
+- Updated: `ProjectOverviewPage` shows a Faculty Review card — managers can assign the faculty reviewer; all members see the read-only feedback history. `getProjectById` populates `assignedFaculty`.
+- Verified: Server `node --check` passes and `app.js` imports cleanly; frontend production build succeeds.
+- Updated (Phase 7 polish): Faculty assignment is now a button → modal → confirm flow on the project overview (select from faculty list, confirm triggers the API, `currentProject` updates live via a cross-slice reducer in `projectSlice` — no page refresh). `FacultyProjectPage` now shows the full task board (read-only 4-column Kanban of all tasks with assignee, priority, and due date).
+- Updated (Phase 7 polish 2): Reviewer name (+ email) is now always visible in the Faculty Review card for all project members. Faculty view reuses the exact student pages — `isProjectMember` now grants read access to the assigned faculty, project routes allow the faculty role on GETs (mutations stay student-only/owner-leader), `/project/:id`, `/milestones`, and `/tasks` routes accept faculty, and `FacultyProjectPage` embeds `ProjectOverviewPage` (embedded mode hides the student back-link) plus the faculty feedback form.
 ```
 
 Keep entries concise.

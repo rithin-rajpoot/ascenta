@@ -1,10 +1,18 @@
 import Team from "../models/Team.js";
 
-// Whether the user can view a project (owner, team leader, or team member).
+// Whether the user can view a project (owner, team leader, team member, or the
+// assigned faculty reviewer).
 export const isProjectMember = async (project, userId) => {
   const userIdStr = String(userId);
 
   if (project.owner && String(project.owner._id || project.owner) === userIdStr) {
+    return true;
+  }
+
+  if (
+    project.assignedFaculty &&
+    String(project.assignedFaculty._id || project.assignedFaculty) === userIdStr
+  ) {
     return true;
   }
 

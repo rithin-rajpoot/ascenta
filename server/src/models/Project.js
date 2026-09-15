@@ -36,6 +36,13 @@ const projectSchema = new mongoose.Schema(
     methodology: { type: String },
     expectedOutcome: { type: String },
     futureScope: { type: String },
+    // Faculty member assigned to review/mentor this project (set by the
+    // project owner or team leader).
+    assignedFaculty: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
     status: {
       type: String,
       enum: ["Idea", "Planning", "Active", "Completed"],

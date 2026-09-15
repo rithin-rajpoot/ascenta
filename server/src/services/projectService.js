@@ -19,6 +19,7 @@ export const createProject = async (data) => {
 export const getProjectById = async (projectId) => {
   const project = await Project.findById(projectId)
     .populate("owner", "name email")
+    .populate("assignedFaculty", "name email")
     .populate({
       path: "team",
       select: "name leader members",

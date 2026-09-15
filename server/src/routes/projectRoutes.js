@@ -11,16 +11,18 @@ import { protect, authorize } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
-// All project routes require authentication and student role
+// All project routes require authentication. Students and the assigned faculty
+// reviewer may read project data; mutating routes below are student-only
+// (controllers additionally enforce owner/leader permissions).
 router.use(protect);
-router.use(authorize("student"));
+router.use(authorize("student", "faculty"));
 
-router.post("/", createProjectController);
+router.post("/", authorize("student"), createProjectController);
 // Must be declared before "/:id" so "team/:teamId" is not matched as an id
-router.get("/team/:teamId", getTeamProjectsController);
+router.get("/team/:teamId", authorize("student"), getTeamProjectsController);
 router.use("/:projectId/milestones", milestoneRoutes);
 router.use("/:projectId/tasks", taskRoutes);
 router.get("/:id", getProjectController);
-router.put("/:id", updateProjectController);
+router.put("/:id", authorize("student"), updateProjectController);
 
 export default router;

@@ -175,6 +175,12 @@ Health check: `GET http://localhost:8000/health`
 
 ---
 
+### Faculty Review Portal (Phase 7)
+- Students (owner/leader) assign a faculty reviewer to their project
+- Faculty dashboard lists assigned projects; project view shows team members and milestone/task progress
+- Faculty submit feedback (comment + optional 1–5 rating); students see feedback history (read-only) on the project overview
+- Feedback is exposed as `/api/faculty/projects/:projectId/reviews`; students have no write access
+
 ## Phase Status
 
 - **Phase 0 — Project Foundation:** Completed
@@ -184,5 +190,6 @@ Health check: `GET http://localhost:8000/health`
 - **Phase 4 — AI Project Blueprint Generator:** Completed
 - **Phase 5 — Milestone Planning:** Completed
 - **Phase 6 — Task Management / Kanban Board:** Completed
+- **Phase 7 — Faculty Review Portal:** Completed
 
 See `PHASES.md` for the full development roadmap.

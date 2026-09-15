@@ -529,6 +529,20 @@ Create:
 - Students can view feedback.
 - Students cannot modify faculty feedback.
 
+> **Implementation note:** Faculty assignment is student-initiated — the project owner or team
+> leader assigns a faculty reviewer via `POST /api/faculty/projects/:projectId/assign`
+> (validated to be a faculty user). `Project` gained an `assignedFaculty` field. Faculty routes
+> live under `/api/faculty`: `GET /` (faculty list), `GET /projects` (assigned projects,
+> faculty-only), `GET /projects/:projectId` (project + team + milestone/task progress,
+> faculty-only and only for their own assignment), `POST/GET /projects/:projectId/reviews`
+> (assigned faculty submit; project members and the assigned faculty can view history).
+> Feedback is stored in the `FacultyReview` model (comment required, optional 1–5 rating) and
+> is read-only for students — no student-facing mutation path exists.
+
+## Status
+
+**COMPLETED**
+
 ---
 
 # Phase 8 — AI Technical Assistant

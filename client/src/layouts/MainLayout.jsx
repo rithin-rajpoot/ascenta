@@ -47,7 +47,7 @@ function MainLayout() {
                   </NavLink>
                 )}
                 {user.role === "faculty" && (
-                  <NavLink to="/" className={navLinkClass}>
+                  <NavLink to="/faculty" className={navLinkClass}>
                     Dashboard
                   </NavLink>
                 )}

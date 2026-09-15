@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+﻿import { Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "../layouts/MainLayout";
 import AuthLayout from "../layouts/AuthLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
@@ -18,6 +18,8 @@ import ProjectBlueprintPage from "../pages/project/ProjectBlueprintPage";
 import ProjectOverviewPage from "../pages/project/ProjectOverviewPage";
 import ProjectMilestonesPage from "../pages/project/ProjectMilestonesPage";
 import ProjectTasksPage from "../pages/project/ProjectTasksPage";
+import FacultyDashboardPage from "../pages/faculty/FacultyDashboardPage";
+import FacultyProjectPage from "../pages/faculty/FacultyProjectPage";
 
 function AppRoutes() {
   return (
@@ -100,7 +102,7 @@ function AppRoutes() {
         <Route
           path="/project/:id"
           element={
-            <ProtectedRoute roles={["student"]}>
+            <ProtectedRoute roles={["student", "faculty"]}>
               <ProjectOverviewPage />
             </ProtectedRoute>
           }
@@ -108,7 +110,7 @@ function AppRoutes() {
         <Route
           path="/project/:id/milestones"
           element={
-            <ProtectedRoute roles={["student"]}>
+            <ProtectedRoute roles={["student", "faculty"]}>
               <ProjectMilestonesPage />
             </ProtectedRoute>
           }
@@ -116,8 +118,24 @@ function AppRoutes() {
         <Route
           path="/project/:id/tasks"
           element={
-            <ProtectedRoute roles={["student"]}>
+            <ProtectedRoute roles={["student", "faculty"]}>
               <ProjectTasksPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/faculty"
+          element={
+            <ProtectedRoute roles={["faculty"]}>
+              <FacultyDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/faculty/project/:id"
+          element={
+            <ProtectedRoute roles={["faculty"]}>
+              <FacultyProjectPage />
             </ProtectedRoute>
           }
         />

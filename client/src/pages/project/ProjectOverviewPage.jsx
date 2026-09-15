@@ -1,23 +1,63 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Loader2, ArrowLeft, CheckCircle2, Milestone as MilestoneIcon, ListChecks as TaskIcon, ArrowRight } from "lucide-react";
+import { Loader2, ArrowLeft, CheckCircle2, Milestone as MilestoneIcon, ListChecks as TaskIcon, GraduationCap, MessageSquare, Star, ArrowRight } from "lucide-react";
 import { getProject, getMilestones } from "../../store/slices/projectSlice";
 import { getTasks } from "../../store/slices/taskSlice";
+import { getFacultyList, getProjectReviews, assignFaculty } from "../../store/slices/facultySlice";
 
-function ProjectOverviewPage() {
+function ProjectOverviewPage({ embedded = false }) {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
   const { currentProject, milestones, isLoading, error } = useSelector((state) => state.project);
   const { tasks } = useSelector((state) => state.task);
+  const { facultyList, reviews } = useSelector((state) => state.faculty);
+  const [assignError, setAssignError] = useState(null);
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [selectedFacultyId, setSelectedFacultyId] = useState("");
+  const [isAssigning, setIsAssigning] = useState(false);
+
+  const userId = user?.id || user?._id;
+  const isManager =
+    !!userId &&
+    !!currentProject &&
+    (String(currentProject.owner?._id || currentProject.owner || "") === String(userId) ||
+      String(currentProject.team?.leader?._id || currentProject.team?.leader || "") === String(userId));
 
   useEffect(() => {
     if (id) {
       dispatch(getProject(id));
       dispatch(getMilestones(id));
       dispatch(getTasks(id));
+      dispatch(getFacultyList());
+      dispatch(getProjectReviews(id));
     }
   }, [dispatch, id]);
+
+  const openAssignModal = () => {
+    setSelectedFacultyId(
+      currentProject.assignedFaculty
+        ? String(currentProject.assignedFaculty._id || currentProject.assignedFaculty)
+        : ""
+    );
+    setAssignError(null);
+    setAssignOpen(true);
+  };
+
+  const handleAssignFaculty = async () => {
+    if (!selectedFacultyId) return;
+    setIsAssigning(true);
+    setAssignError(null);
+    const result = await dispatch(assignFaculty({ projectId: id, facultyId: selectedFacultyId }));
+    setIsAssigning(false);
+    if (result.meta.requestStatus === "fulfilled") {
+      // currentProject is updated live via the projectSlice listener — no refresh needed.
+      setAssignOpen(false);
+    } else {
+      setAssignError(result.payload || "Failed to assign faculty");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -40,13 +80,15 @@ function ProjectOverviewPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <Link
-        to="/teams"
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-text-primary"
-      >
-        <ArrowLeft size={16} />
-        Back to Dashboard
-      </Link>
+      {!embedded && (
+        <Link
+          to="/teams"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-text-primary"
+        >
+          <ArrowLeft size={16} />
+          Back to Dashboard
+        </Link>
+      )}
 
       <div className="flex flex-col md:flex-row gap-6">
         
@@ -128,6 +170,156 @@ function ProjectOverviewPage() {
               );
             })()}
           </div>
+
+          {/* Faculty Review */}
+          <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="flex items-center gap-2 text-lg font-bold text-text-primary">
+                <GraduationCap size={20} className="text-primary" />
+                Faculty Review
+              </h2>
+              {isManager && (
+                <button
+                  onClick={openAssignModal}
+                  className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-1.5 text-sm font-medium text-text-primary hover:border-primary hover:text-primary"
+                >
+                  <GraduationCap size={15} />
+                  {currentProject.assignedFaculty ? "Change Reviewer" : "Assign Faculty"}
+                </button>
+              )}
+            </div>
+            {currentProject.assignedFaculty && (
+              <p className="mt-3 text-sm text-text-secondary">
+                Reviewer: {currentProject.assignedFaculty.name}
+                {currentProject.assignedFaculty.email ? ` · ${currentProject.assignedFaculty.email}` : ""}
+              </p>
+            )}
+            {assignError && (
+              <p className="mt-3 rounded-lg border border-error-light bg-error-light px-3 py-2 text-sm text-error">
+                {assignError}
+              </p>
+            )}
+
+            <div className="mt-4 space-y-3">
+              <p className="flex items-center gap-1.5 text-sm font-medium text-text-primary">
+                <MessageSquare size={14} className="text-text-muted" />
+                Feedback history ({reviews.length})
+              </p>
+              {reviews.length === 0 ? (
+                <p className="text-sm text-text-muted">
+                  {currentProject.assignedFaculty
+                    ? "No feedback yet. Your faculty reviewer will share feedback here."
+                    : "No faculty reviewer assigned yet."}
+                </p>
+              ) : (
+                reviews.map((review) => (
+                  <div key={review._id} className="rounded-lg border border-border bg-background p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-sm font-medium text-text-primary">
+                        {review.faculty?.name || "Faculty"}
+                      </p>
+                      <span className="text-xs text-text-muted">
+                        {new Date(review.createdAt).toLocaleDateString(undefined, {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    {review.rating && (
+                      <p className="mt-1 flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            size={13}
+                            className={i < review.rating ? "fill-warning text-warning" : "text-text-muted"}
+                          />
+                        ))}
+                      </p>
+                    )}
+                    <p className="mt-2 text-sm text-text-secondary whitespace-pre-line">{review.comment}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Assign Faculty modal */}
+          {assignOpen && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+              onClick={() => setAssignOpen(false)}
+            >
+              <div
+                className="w-full max-w-md rounded-2xl border border-border bg-surface p-5 shadow-lg"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-semibold text-text-primary">
+                    {currentProject.assignedFaculty ? "Change Faculty Reviewer" : "Assign Faculty Reviewer"}
+                  </h3>
+                  <button
+                    onClick={() => setAssignOpen(false)}
+                    className="text-text-muted hover:text-text-primary"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <p className="mt-1 text-xs text-text-muted">
+                  Select a faculty member and confirm. They will be able to view this project and
+                  leave feedback.
+                </p>
+
+                <div className="mt-4 max-h-64 space-y-2 overflow-y-auto">
+                  {facultyList.length === 0 ? (
+                    <p className="py-4 text-center text-sm text-text-muted">No faculty members found.</p>
+                  ) : (
+                    facultyList.map((f) => {
+                      const selected = selectedFacultyId === f._id;
+                      return (
+                        <button
+                          key={f._id}
+                          type="button"
+                          onClick={() => setSelectedFacultyId(f._id)}
+                          className={`w-full rounded-lg border px-4 py-3 text-left transition-colors ${
+                            selected
+                              ? "border-primary bg-primary-light/50"
+                              : "border-border bg-background hover:border-primary/50"
+                          }`}
+                        >
+                          <p className="text-sm font-medium text-text-primary">{f.name}</p>
+                          <p className="text-xs text-text-muted">{f.email}</p>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+
+                {assignError && (
+                  <p className="mt-3 rounded-lg border border-error-light bg-error-light px-3 py-2 text-sm text-error">
+                    {assignError}
+                  </p>
+                )}
+
+                <div className="mt-4 flex justify-end gap-2">
+                  <button
+                    onClick={() => setAssignOpen(false)}
+                    className="rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-text-primary hover:bg-background"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleAssignFaculty}
+                    disabled={!selectedFacultyId || isAssigning}
+                    className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark disabled:opacity-50"
+                  >
+                    {isAssigning && <Loader2 size={14} className="animate-spin" />}
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="rounded-2xl border border-border bg-surface p-8 shadow-sm">
             <h2 className="text-xl font-bold text-text-primary mb-4">Problem Statement</h2>

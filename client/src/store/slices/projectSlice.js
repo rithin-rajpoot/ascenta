@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as projectService from "../../services/projectService";
+import { assignFaculty } from "./facultySlice";
 
 const initialState = {
   currentProject: null,
@@ -229,6 +230,11 @@ const projectSlice = createSlice({
       .addCase(deleteMilestone.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      })
+      // Keep the overview page live when a faculty reviewer is assigned
+      // (the assign API returns the fully populated project).
+      .addCase(assignFaculty.fulfilled, (state, action) => {
+        state.currentProject = action.payload;
       });
   },
 });

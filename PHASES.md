@@ -772,6 +772,19 @@ Useful metrics:
 - Dashboard is responsive.
 - No unnecessary analytics complexity is introduced.
 
+> **Implementation note:** `GET /api/dashboard/student` (student-only) aggregates all of a
+> student's projects (owned or team-based) with per-project milestone/task counts, pending and
+> personally-assigned task counts, next upcoming deadline, a combined progress %, and the 5 most
+> recent faculty feedback entries. `GET /api/faculty/dashboard` (faculty-only) does the same for
+> assigned projects plus feedback counts and last-feedback date. Simple metrics only — no chart
+> library. UI: `StudentDashboardPage` (`/dashboard`, student nav link) with stat cards, project
+> progress cards, and recent feedback; the faculty portal now shows the same stats grid and
+> per-project progress bars/pending-task/feedback counts.
+
+## Status
+
+**COMPLETED**
+
 ---
 
 # Phase 12 — Integration, Testing & Polish

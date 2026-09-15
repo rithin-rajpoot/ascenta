@@ -7,6 +7,7 @@ import AboutPage from "../pages/AboutPage";
 import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import ProfilePage from "../pages/ProfilePage";
+import StudentDashboardPage from "../pages/dashboard/StudentDashboardPage";
 import TeamSetupPage from "../pages/team/TeamSetupPage";
 import CreateTeamPage from "../pages/team/CreateTeamPage";
 import JoinTeamPage from "../pages/team/JoinTeamPage";
@@ -33,6 +34,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute roles={["student"]}>
+              <StudentDashboardPage />
             </ProtectedRoute>
           }
         />

@@ -6,6 +6,7 @@ import {
   getProjectReviews,
   createReview,
   assignFaculty,
+  getFacultyDashboard,
 } from "../controllers/facultyController.js";
 import { protect, authorize } from "../middleware/authMiddleware.js";
 
@@ -18,6 +19,7 @@ router.use(protect);
 router.get("/", getFacultyList);
 
 // Faculty-only: assigned projects and project detail.
+router.get("/dashboard", authorize("faculty"), getFacultyDashboard);
 router.get("/projects", authorize("faculty"), getAssignedProjects);
 router.get("/projects/:projectId", authorize("faculty"), getFacultyProjectDetail);
 

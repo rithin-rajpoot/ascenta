@@ -1,12 +1,29 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Loader2, GraduationCap, ArrowRight, Users } from "lucide-react";
-import { getAssignedProjects } from "../../store/slices/facultySlice";
+import { Loader2, GraduationCap, ArrowRight, Users, Star, Clock, TrendingUp, FolderKanban } from "lucide-react";
+import { fetchFacultyDashboard } from "../../store/slices/dashboardSlice";
+
+const fmtDate = (v) =>
+  v
+    ? new Date(v).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })
+    : null;
 
 function FacultyDashboardPage() {
   const dispatch = useDispatch();
-  const { assignedProjects, isLoading, error } = useSelector((state) => state.faculty);
+  const { faculty, isLoading, error } = useSelector((state) => state.dashboard);
+
+  useEffect(() => {
+    dispatch(fetchFacultyDashboard());
+  }, [dispatch]);
+
+  const stats = faculty?.stats;
+  const statCards = [
+    { icon: FolderKanban, label: "Assigned Projects", value: stats?.assignedProjects ?? 0 },
+    { icon: TrendingUp, label: "Milestones Completed", value: stats?.totalMilestonesCompleted ?? 0 },
+    { icon: Clock, label: "Pending Tasks", value: stats?.totalTasksPending ?? 0 },
+    { icon: Star, label: "Feedback Given", value: stats?.totalFeedback ?? 0 },
+  ];
 
   useEffect(() => {
     dispatch(getAssignedProjects());
@@ -28,11 +45,22 @@ function FacultyDashboardPage() {
         </p>
       )}
 
-      {isLoading && !assignedProjects.length ? (
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {statCards.map((card) => (
+          <div key={card.label} className="rounded-xl border border-border bg-surface p-5 shadow-sm">
+            <card.icon size={20} className="text-primary" />
+            <p className="mt-3 text-2xl font-bold text-text-primary">{card.value}</p>
+            <p className="text-sm font-medium text-text-secondary">{card.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {isLoading && !faculty ? (
         <div className="flex min-h-[300px] items-center justify-center">
           <Loader2 size={30} className="animate-spin text-primary" />
         </div>
-      ) : assignedProjects.length === 0 ? (
+      ) : !faculty || faculty.projects.length === 0 ? (
         <div className="rounded-2xl border border-border bg-surface p-10 text-center shadow-sm">
           <p className="text-text-secondary">No projects assigned to you yet.</p>
           <p className="mt-1 text-sm text-text-muted">
@@ -41,7 +69,8 @@ function FacultyDashboardPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {assignedProjects.map((project) => {
+          {faculty.projects.map((card) => {
+            const project = card.project;
             const members = [
               ...(project.team?.leader ? [project.team.leader] : []),
               ...(project.team?.members || []),
@@ -59,18 +88,35 @@ function FacultyDashboardPage() {
                       {project.description}
                     </p>
                   </div>
-                  <ArrowRight size={18} className="mt-1 shrink-0 text-text-muted" />
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary-light px-2.5 py-1 text-xs font-semibold text-primary">
+                    {card.progressPct}%
+                    <ArrowRight size={12} />
+                  </span>
                 </div>
+
+                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-background">
+                  <div
+                    className="h-full rounded-full bg-primary transition-all duration-300"
+                    style={{ width: `${card.progressPct}%` }}
+                  />
+                </div>
+
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
                   <span className="rounded-full bg-surface-dark px-2.5 py-0.5 font-semibold text-text-secondary">
                     {project.status}
                   </span>
-                  <span className="rounded-full bg-background px-2.5 py-0.5 text-text-secondary border border-border">
-                    {project.domain || "General"}
-                  </span>
                   <span className="inline-flex items-center gap-1 text-text-muted">
                     <Users size={12} />
-                    {members.length} team member{members.length === 1 ? "" : "s"}
+                    {members.length} member{members.length === 1 ? "" : "s"}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-text-muted">
+                    <Clock size={12} />
+                    {card.tasksPending} pending task{card.tasksPending === 1 ? "" : "s"}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-text-muted">
+                    <Star size={12} />
+                    {card.feedbackCount} feedback{card.feedbackCount === 1 ? "" : ""}
+                    {card.lastFeedbackAt ? ` · last ${fmtDate(card.lastFeedbackAt)}` : ""}
                   </span>
                 </div>
               </Link>

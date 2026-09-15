@@ -92,17 +92,17 @@ The Gemini API key must remain inside the FastAPI service and must never be expo
 
 ## Overall Status
 
-**Phase 10 — Notifications is complete. Phase 9 — AI Documentation Generator is SKIPPED (deferred by project decision).**
+**Phase 11 — Dashboards & Progress Overview is complete. Phase 9 — AI Documentation Generator remains SKIPPED (deferred by project decision).**
 
-Students and faculty get a notification bell with an unread badge in the main navigation, opening a dropdown panel. Events (fire-and-forget, never breaking the primary flow): team invitation (added to team), task assignment/reassignment, milestone deadline set (team members except creator), and faculty feedback (project owner + leader). Notifications support mark-one/mark-all read and deep-link navigation; the unread badge polls every 30s. Exposed via `/api/notifications`.
+Students get a `/dashboard` page (nav link) with stat cards, per-project progress cards (milestone/task counts, pending & own tasks, next deadline), and recent faculty feedback. Faculty get the same stats treatment on their portal (progress bars, pending tasks, feedback counts per assigned project). Both are served by aggregation endpoints (`GET /api/dashboard/student`, `GET /api/faculty/dashboard`) computed from real database state with simple metrics only.
 
 ## Current Phase
 
-**Phase 10 — Notifications (COMPLETED) · Phase 9 (Documentation Generator) SKIPPED**
+**Phase 11 — Dashboards & Progress Overview (COMPLETED) · Phase 9 SKIPPED**
 
 ## Current Task
 
-Phase 10 — Notifications is complete and ready to commit/push. Next up: Phase 11 — Dashboards & Progress Overview.
+Phase 11 is complete and ready to commit/push. Remaining: Phase 12 — Integration, Testing & Polish.
 
 ---
 
@@ -760,6 +760,13 @@ Use this section for major completed changes.
 - Wired events: team invite (`teamService.inviteMember`), task assignment/reassignment (`taskController`), milestone deadline set (`milestoneController.createMilestone`, team except creator), faculty feedback (`facultyService.createReview`, owner + leader).
 - Added (client): `notificationService` API client, `notificationSlice` (fetch/mark-read/mark-all + panel open state), bell with unread badge + dropdown panel in `MainLayout` (deep-link navigation, 30s badge polling).
 - Verified: server `node --check` on all touched files + app import OK; frontend production build succeeds.
+### 2026-09-06 — Phase 11: Dashboards & Progress Overview
+
+- Added: `dashboardService` (`getStudentDashboard` — projects owned/team-based with per-project milestone/task stats, my pending tasks, next deadline, combined progress %, recent 5 feedback; `getFacultyDashboard` — assigned projects with stats + feedback counts/last feedback date).
+- Added: `dashboardController`, `dashboardRoutes` (`GET /api/dashboard/student`, student-only) and `GET /api/faculty/dashboard` (faculty-only).
+- Added (client): `dashboardService` API client, `dashboardSlice`, `StudentDashboardPage` (`/dashboard` — stat cards, project progress cards, recent feedback), route registered, student "Dashboard" nav link in `MainLayout`.
+- Updated: `FacultyDashboardPage` now uses the dashboard endpoint — stats grid + per-project progress bars, pending tasks, feedback counts.
+- Verified: server `node --check` + app import OK; frontend production build succeeds.
 ```
 
 Keep entries concise.

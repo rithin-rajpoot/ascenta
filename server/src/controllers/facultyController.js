@@ -1,10 +1,20 @@
 import * as facultyService from "../services/facultyService.js";
+import * as dashboardService from "../services/dashboardService.js";
 import { isProjectMember } from "../utils/projectAccess.js";
 
 export const getFacultyList = async (req, res, next) => {
   try {
     const faculty = await facultyService.getFacultyList();
     res.status(200).json({ success: true, faculty });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getFacultyDashboard = async (req, res, next) => {
+  try {
+    const data = await dashboardService.getFacultyDashboard(req.user._id);
+    res.status(200).json({ success: true, ...data });
   } catch (error) {
     next(error);
   }

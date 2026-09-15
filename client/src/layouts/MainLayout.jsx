@@ -65,9 +65,14 @@ function MainLayout() {
             {user ? (
               <>
                 {user.role === "student" && (
-                  <NavLink to="/teams" className={navLinkClass}>
-                    Teams
-                  </NavLink>
+                  <>
+                    <NavLink to="/dashboard" className={navLinkClass} end={false}>
+                      Dashboard
+                    </NavLink>
+                    <NavLink to="/teams" className={navLinkClass}>
+                      Teams
+                    </NavLink>
+                  </>
                 )}
                 {user.role === "faculty" && (
                   <NavLink to="/faculty" className={navLinkClass}>

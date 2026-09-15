@@ -194,6 +194,11 @@ Health check: `GET http://localhost:8000/health`
 - Mark one or all notifications as read; clicking a notification deep-links to the relevant page
 - Exposed as `/api/notifications` (`GET /`, `GET /unread`, `PUT /:id/read`, `PUT /read-all`); unread badge polls every 30s
 
+### Dashboards & Progress Overview (Phase 11)
+- Student dashboard (`/dashboard`): stat cards (active projects, pending tasks, milestones done, overall progress), per-project progress cards (milestone/task counts, pending & personally-assigned tasks, next deadline), recent faculty feedback
+- Faculty dashboard: stats grid plus per-project progress bars, pending task counts, and feedback counts/last feedback date
+- Backed by `GET /api/dashboard/student` and `GET /api/faculty/dashboard` — computed from actual database state, no extra analytics dependencies
+
 ### Skipped
 - **Phase 9 — AI Documentation Generator:** deferred by project decision (see `PHASES.md`)
 
@@ -210,5 +215,6 @@ Health check: `GET http://localhost:8000/health`
 - **Phase 8 — AI Technical Assistant:** Completed
 - **Phase 9 — AI Documentation Generator:** Skipped (deferred by project decision)
 - **Phase 10 — Notifications:** Completed
+- **Phase 11 — Dashboards & Progress Overview:** Completed
 
 See `PHASES.md` for the full development roadmap.

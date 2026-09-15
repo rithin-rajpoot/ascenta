@@ -8,6 +8,7 @@ import projectRoutes from "./routes/projectRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import facultyRoutes from "./routes/facultyRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import dashboardRoutes from "./routes/dashboardRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 
 const app = express();
@@ -28,6 +29,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/faculty", facultyRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

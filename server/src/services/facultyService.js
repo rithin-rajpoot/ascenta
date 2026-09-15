@@ -3,6 +3,7 @@ import FacultyReview from "../models/FacultyReview.js";
 import * as milestoneService from "./milestoneService.js";
 import * as taskService from "./taskService.js";
 import * as projectService from "./projectService.js";
+import { notifyMany } from "./notificationService.js";
 
 // List all faculty members (used by students when assigning a reviewer).
 export const getFacultyList = async () => {
@@ -53,7 +54,32 @@ export const createReview = async ({ projectId, facultyId, comment, rating }) =>
     error.status = 403;
     throw error;
   }
-  return FacultyReview.create({ project: projectId, faculty: facultyId, comment, rating: rating || null });
+  const review = await FacultyReview.create({
+    project: projectId,
+    faculty: facultyId,
+    comment,
+    rating: rating || null,
+  });
+
+  // Notify the team (owner + leader, Phase 10) — fire-and-forget.
+  if (project.team) {
+    const { default: Team } = await import("../models/Team.js");
+    const team = await Team.findById(project.team._id || project.team);
+    if (team) {
+      const { default: User } = await import("../models/User.js");
+      const facultyUser = await User.findById(facultyId).select("name");
+      const recipients = [project.owner?._id || project.owner, String(team.leader)].filter(Boolean);
+      notifyMany(recipients, {
+        type: "faculty_feedback",
+        title: "New faculty feedback",
+        message: `${facultyUser?.name || "Your faculty reviewer"} left feedback on “${project.title}”.`,
+        project: project._id,
+        link: `/project/${project._id}`,
+      });
+    }
+  }
+
+  return review;
 };
 
 // Assign / change the faculty reviewer (project owner or team leader only).

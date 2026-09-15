@@ -2,6 +2,7 @@ import * as taskService from "../services/taskService.js";
 import * as projectService from "../services/projectService.js";
 import { isProjectMember, isProjectManager } from "../utils/projectAccess.js";
 import Team from "../models/Team.js";
+import { notify } from "../services/notificationService.js";
 
 const VALID_STATUSES = ["Todo", "In Progress", "Review", "Completed"];
 const VALID_PRIORITIES = ["Low", "Medium", "High"];
@@ -77,6 +78,19 @@ export const createTask = async (req, res, next) => {
     });
 
     const populated = await taskService.updateTask(task._id, {});
+
+    // Notify the assignee (Phase 10) — fire-and-forget.
+    if (populated.assignedTo && String(populated.assignedTo._id) !== String(req.user._id)) {
+      notify({
+        user: populated.assignedTo._id,
+        type: "task_assigned",
+        title: "New task assigned",
+        message: `“${populated.title}” has been assigned to you in “${project.title}”.`,
+        project: project._id,
+        link: `/project/${project._id}/tasks`,
+      });
+    }
+
     res.status(201).json({ success: true, task: populated });
   } catch (error) {
     next(error);
@@ -131,6 +145,25 @@ export const updateTask = async (req, res, next) => {
     }
 
     const task = await taskService.updateTask(req.params.taskId, data);
+
+    // Notify on (re)assignment (Phase 10) — fire-and-forget.
+    if (task.assignedTo && String(task.assignedTo._id) !== String(req.user._id)) {
+      const changedAssignee =
+        "assignedTo" in data &&
+        (!existing.assignedTo ||
+          String(existing.assignedTo._id || existing.assignedTo) !== String(task.assignedTo._id));
+      if (changedAssignee) {
+        notify({
+          user: task.assignedTo._id,
+          type: "task_assigned",
+          title: "New task assigned",
+          message: `“${task.title}” has been assigned to you in “${project.title}”.`,
+          project: project._id,
+          link: `/project/${project._id}/tasks`,
+        });
+      }
+    }
+
     res.status(200).json({ success: true, task });
   } catch (error) {
     next(error);

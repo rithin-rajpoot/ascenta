@@ -43,7 +43,7 @@ The current MVP includes:
 - AI milestone planning
 - Kanban task management
 - Faculty project reviews and feedback
-- AI documentation generation
+- AI documentation generation (SKIPPED/deferred — see PHASES.md Phase 9)
 - AI technical assistant
 - Notifications
 - Student dashboard
@@ -844,9 +844,11 @@ The required MVP AI layer consists of:
 
 ```text
 POST /ai/project-blueprint
-POST /ai/documentation
 POST /ai/assistant
 ```
+
+`POST /ai/documentation` is part of Phase 9 (AI Documentation Generator), which is currently
+SKIPPED/deferred — do not implement it unless explicitly requested.
 
 Do not add additional AI endpoints unless they provide a clear benefit and sufficient development time remains.
 

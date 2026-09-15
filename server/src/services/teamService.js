@@ -1,6 +1,7 @@
 import Team from "../models/Team.js";
 import User from "../models/User.js";
 import { generateInviteCode } from "../utils/generateInviteCode.js";
+import { notify } from "./notificationService.js";
 
 /**
  * Generate a guaranteed-unique invite code for a team.
@@ -124,6 +125,16 @@ export const inviteMember = async ({ teamId, userId, leaderId }) => {
 
   team.members.push(userId);
   await team.save();
+
+  // Notify the invited student (Phase 10).
+  notify({
+    user: userId,
+    type: "team_invite",
+    title: "Added to a team",
+    message: `You have been added to the team “${team.name}”.`,
+    link: `/team/${team._id}`,
+  });
+
   return loadTeamRefs(team);
 }
 

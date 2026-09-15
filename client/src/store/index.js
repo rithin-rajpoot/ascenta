@@ -4,6 +4,7 @@ import teamReducer from "./slices/teamSlice.js";
 import projectReducer from "./slices/projectSlice.js";
 import taskReducer from "./slices/taskSlice.js";
 import facultyReducer from "./slices/facultySlice.js";
+import notificationReducer from "./slices/notificationSlice.js";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     project: projectReducer,
     task: taskReducer,
     faculty: facultyReducer,
+    notification: notificationReducer,
   },
 });
 

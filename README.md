@@ -188,6 +188,15 @@ Health check: `GET http://localhost:8000/health`
 - Responses are guidance only — no secrets, no code execution, no automatic project modification
 - Exposed as `POST /ai/assistant` (FastAPI) proxied by the Express backend; failures surface as retryable error bubbles
 
+### Notifications (Phase 10)
+- Bell with unread badge in the main navigation (all roles); opens a dropdown panel
+- Events: team invitation (added to team), task assignment/reassignment, milestone deadline set, faculty feedback
+- Mark one or all notifications as read; clicking a notification deep-links to the relevant page
+- Exposed as `/api/notifications` (`GET /`, `GET /unread`, `PUT /:id/read`, `PUT /read-all`); unread badge polls every 30s
+
+### Skipped
+- **Phase 9 — AI Documentation Generator:** deferred by project decision (see `PHASES.md`)
+
 ## Phase Status
 
 - **Phase 0 — Project Foundation:** Completed
@@ -199,5 +208,7 @@ Health check: `GET http://localhost:8000/health`
 - **Phase 6 — Task Management / Kanban Board:** Completed
 - **Phase 7 — Faculty Review Portal:** Completed
 - **Phase 8 — AI Technical Assistant:** Completed
+- **Phase 9 — AI Documentation Generator:** Skipped (deferred by project decision)
+- **Phase 10 — Notifications:** Completed
 
 See `PHASES.md` for the full development roadmap.

@@ -419,7 +419,7 @@ The MVP will include:
 - Milestone Planning
 - Kanban Task Board
 - Faculty Review
-- Documentation Generator
+- Documentation Generator (SKIPPED — deferred, see PHASES.md Phase 9)
 - AI Technical Assistant
 - Notifications
 - Dashboards

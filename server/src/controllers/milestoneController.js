@@ -1,6 +1,8 @@
 import * as milestoneService from "../services/milestoneService.js";
 import * as projectService from "../services/projectService.js";
 import { isProjectMember, isProjectManager } from "../utils/projectAccess.js";
+import Team from "../models/Team.js";
+import { notifyMany } from "../services/notificationService.js";
 
 export const getMilestones = async (req, res, next) => {
   try {
@@ -37,6 +39,25 @@ export const createMilestone = async (req, res, next) => {
       project: req.params.projectId,
       createdBy: req.user._id,
     });
+
+    // Deadline reminder for the rest of the team (Phase 10) — fire-and-forget.
+    if (req.body.deadline && project.team) {
+      const team = await Team.findById(project.team._id || project.team);
+      if (team) {
+        const recipients = [
+          String(team.leader),
+          ...team.members.map(String),
+        ].filter((id) => id !== String(req.user._id));
+        const due = new Date(req.body.deadline).toLocaleDateString();
+        notifyMany(recipients, {
+          type: "milestone_deadline",
+          title: "Milestone deadline set",
+          message: `“${milestone.title}” is due ${due} in “${project.title}”.`,
+          project: project._id,
+          link: `/project/${project._id}/milestones`,
+        });
+      }
+    }
 
     res.status(201).json({ success: true, milestone });
   } catch (error) {

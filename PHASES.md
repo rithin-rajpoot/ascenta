@@ -670,6 +670,15 @@ Use:
 - Student can save the document.
 - Existing saved content is protected from accidental overwrite.
 
+> **Status: SKIPPED (deferred by project decision).** The AI Documentation Generator is not
+> implemented for now. The `Documents` model, the `POST /ai/documentation` endpoint, and the
+> documentation UI are intentionally omitted from the current build and can be revisited after
+> the remaining phases if time permits.
+
+## Status
+
+**SKIPPED (deferred)**
+
 ---
 
 # Phase 10 — Notifications
@@ -702,6 +711,19 @@ Real-time notifications are optional.
 - Important events create notifications.
 - Users can view notifications.
 - Notifications can be marked as read.
+
+> **Implementation note:** `Notification` model (recipient, type, title, message, optional
+> project ref + deep-link path, read flag). Exposed at `/api/notifications` (authenticated):
+> `GET /` (list + unread count), `GET /unread`, `PUT /:id/read`, `PUT /read-all`. Events are
+> fire-and-forget so they can never break the primary flow: team invite (added to team),
+> task assignment (create + reassignment), milestone deadline set (all team members except
+> the creator), and faculty feedback (project owner + leader). The UI is a bell with unread
+> badge in the main nav opening a dropdown panel (mark one/all read, deep-links navigate);
+> the unread badge polls every 30s. No real-time websockets for MVP.
+
+## Status
+
+**COMPLETED**
 
 ---
 

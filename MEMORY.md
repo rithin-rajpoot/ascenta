@@ -92,17 +92,17 @@ The Gemini API key must remain inside the FastAPI service and must never be expo
 
 ## Overall Status
 
-**Phase 8 — AI Technical Assistant is complete.**
+**Phase 10 — Notifications is complete. Phase 9 — AI Documentation Generator is SKIPPED (deferred by project decision).**
 
-Students open a project-aware chat assistant from the project workspace (`/project/:id/assistant`). The assistant answers technical questions (concepts, APIs, database structures, auth, architecture, debugging, implementation approaches) with the project blueprint as context, plus the last ~6 conversation turns for continuity. Responses are guidance-only; no secrets, no code execution, no automatic project data modification. Exposed as `POST /ai/assistant` (FastAPI, free-text generation) proxied by `POST /api/ai/assistant` (student-only). API failures surface as retryable error bubbles.
+Students and faculty get a notification bell with an unread badge in the main navigation, opening a dropdown panel. Events (fire-and-forget, never breaking the primary flow): team invitation (added to team), task assignment/reassignment, milestone deadline set (team members except creator), and faculty feedback (project owner + leader). Notifications support mark-one/mark-all read and deep-link navigation; the unread badge polls every 30s. Exposed via `/api/notifications`.
 
 ## Current Phase
 
-**Phase 8 — AI Technical Assistant (COMPLETED)**
+**Phase 10 — Notifications (COMPLETED) · Phase 9 (Documentation Generator) SKIPPED**
 
 ## Current Task
 
-Phase 8 — AI Technical Assistant is complete and ready to commit/push. All MVP phases (0–8) are complete; see PHASES.md for any remaining roadmap items.
+Phase 10 — Notifications is complete and ready to commit/push. Next up: Phase 11 — Dashboards & Progress Overview.
 
 ---
 
@@ -750,6 +750,16 @@ Use this section for major completed changes.
 - Added (client): `askAssistant` in `aiService`; `ProjectAssistantPage` (`/project/:id/assistant`) chat UI with suggestion chips, typing indicator, auto-scroll, and retryable error handling; "AI Assistant" card on `ProjectOverviewPage`; route registered (student-only).
 - Verified: FastAPI app + router import OK with `/ai/assistant` registered; server `node --check` + app import OK; frontend production build succeeds.
 - Updated (Phase 8 polish): Added shared `ProjectTabs` nav (Overview / Milestones / Tasks / AI Assistant) rendered on all project pages, and unified the workspace shell — every project page now uses `max-w-6xl` with `space-y-6` spacing (assistant centers its chat column inside), so layout stays consistent across tab switches.
+### 2026-09-06 — Phase 9 marked SKIPPED + docs audit
+
+- Decision: Phase 9 — AI Documentation Generator is SKIPPED/deferred. Marked in PHASES.md (status + note), README.md (phase list + Skipped section), Architecture.md (MVP modules ⊘), RULES.md (MVP scope + removed `POST /ai/documentation` from required AI endpoints), PRD.md (MVP scope).
+### 2026-09-06 — Phase 10: Notifications
+
+- Added: `Notification` model (user, type team_invite/task_assigned/milestone_deadline/faculty_feedback, title, message, optional project ref + link, read flag).
+- Added: `notificationService` (fire-and-forget `notify`/`notifyMany` so events never break primary flows), `notificationController`, `notificationRoutes` mounted at `/api/notifications` (GET /, GET /unread, PUT /:id/read, PUT /read-all).
+- Wired events: team invite (`teamService.inviteMember`), task assignment/reassignment (`taskController`), milestone deadline set (`milestoneController.createMilestone`, team except creator), faculty feedback (`facultyService.createReview`, owner + leader).
+- Added (client): `notificationService` API client, `notificationSlice` (fetch/mark-read/mark-all + panel open state), bell with unread badge + dropdown panel in `MainLayout` (deep-link navigation, 30s badge polling).
+- Verified: server `node --check` on all touched files + app import OK; frontend production build succeeds.
 ```
 
 Keep entries concise.

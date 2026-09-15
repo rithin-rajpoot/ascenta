@@ -704,7 +704,7 @@ Response
 
 ✔ Faculty Review
 
-✔ Documentation Generator
+⊘ Documentation Generator (skipped — deferred)
 
 ✔ AI Technical Assistant
 

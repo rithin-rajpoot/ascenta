@@ -20,6 +20,11 @@ export const updateProject = async (projectId, data) => {
   return res;
 };
 
+export const deleteProject = async (projectId) => {
+  const { data: res } = await api.delete(`/projects/${projectId}`);
+  return res;
+};
+
 // --- Milestones ---
 
 export const getMilestones = async (projectId) => {

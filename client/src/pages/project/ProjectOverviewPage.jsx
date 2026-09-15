@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Loader2, ArrowLeft, CheckCircle2, Milestone as MilestoneIcon, ListChecks as TaskIcon, GraduationCap, MessageSquare, Star, Sparkles as SparklesIcon, ArrowRight } from "lucide-react";
-import { getProject, getMilestones } from "../../store/slices/projectSlice";
+import { Loader2, ArrowLeft, CheckCircle2, Milestone as MilestoneIcon, ListChecks as TaskIcon, GraduationCap, MessageSquare, Star, Sparkles as SparklesIcon, ArrowRight, Trash2 } from "lucide-react";
+import { getProject, getMilestones, deleteProject } from "../../store/slices/projectSlice";
 import { getTasks } from "../../store/slices/taskSlice";
 import { getFacultyList, getProjectReviews, assignFaculty } from "../../store/slices/facultySlice";
 import { notifySuccess, notifyErrorFrom } from "../../utils/toast";
 import PageLoader from "../../components/PageLoader";
 import ProjectTabs from "../../components/ProjectTabs";
+import ConfirmModal from "../../components/ConfirmModal";
 
 function ProjectOverviewPage({ embedded = false }) {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
   const { currentProject, milestones, isLoading, error } = useSelector((state) => state.project);
   const { tasks } = useSelector((state) => state.task);
@@ -20,6 +22,8 @@ function ProjectOverviewPage({ embedded = false }) {
   const [assignOpen, setAssignOpen] = useState(false);
   const [selectedFacultyId, setSelectedFacultyId] = useState("");
   const [isAssigning, setIsAssigning] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const userId = user?.id || user?._id;
   const isManager =
@@ -65,6 +69,19 @@ function ProjectOverviewPage({ embedded = false }) {
     }
   };
 
+  const handleDeleteProject = async () => {
+    setIsDeleting(true);
+    const result = await dispatch(deleteProject(id));
+    setIsDeleting(false);
+    if (result.meta.requestStatus === "fulfilled") {
+      notifySuccess("Project deleted successfully");
+      setDeleteOpen(false);
+      navigate("/teams");
+    } else {
+      notifyErrorFrom(result.payload, "Failed to delete the project");
+    }
+  };
+
   if (isLoading) {
     return <PageLoader label="Loading project…" />;
   }
@@ -84,13 +101,25 @@ function ProjectOverviewPage({ embedded = false }) {
     <div className="mx-auto max-w-6xl space-y-6">
       {!embedded && (
         <>
-          <Link
-            to="/teams"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-text-primary"
-          >
-            <ArrowLeft size={16} />
-            Back to Dashboard
-          </Link>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Link
+              to="/teams"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-text-secondary hover:text-text-primary"
+            >
+              <ArrowLeft size={16} />
+              Back to Dashboard
+            </Link>
+            {isManager && (
+              <button
+                type="button"
+                onClick={() => setDeleteOpen(true)}
+                className="inline-flex items-center gap-2 rounded-lg border border-error-light bg-error-light px-3 py-1.5 text-sm font-medium text-error hover:opacity-90"
+              >
+                <Trash2 size={15} />
+                Delete Project
+              </button>
+            )}
+          </div>
           <ProjectTabs id={id} />
         </>
       )}
@@ -450,6 +479,16 @@ function ProjectOverviewPage({ embedded = false }) {
 
         </div>
       </div>
+
+      <ConfirmModal
+        open={deleteOpen}
+        title="Delete this project?"
+        message={`"${currentProject.title}" and all of its milestones, tasks and feedback will be permanently deleted. This cannot be undone.`}
+        confirmLabel="Delete Project"
+        onConfirm={handleDeleteProject}
+        onCancel={() => setDeleteOpen(false)}
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import * as projectService from "../services/projectService.js";
 import Team from "../models/Team.js";
-import { isProjectMember } from "../utils/projectAccess.js";
+import { isProjectMember, isProjectManager } from "../utils/projectAccess.js";
 
 export const createProjectController = async (req, res, next) => {
   try {
@@ -76,6 +76,23 @@ export const updateProjectController = async (req, res, next) => {
 
     const project = await projectService.updateProject(req.params.id, req.body);
     res.status(200).json({ success: true, project });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteProjectController = async (req, res, next) => {
+  try {
+    const existingProject = await projectService.getProjectById(req.params.id);
+
+    // Only the project owner or the team leader may delete the project.
+    const isAuthorized = await isProjectManager(existingProject, req.user._id);
+    if (!isAuthorized) {
+      return res.status(403).json({ success: false, message: "Only the project owner or team leader can delete this project" });
+    }
+
+    await projectService.deleteProject(req.params.id);
+    res.status(200).json({ success: true, message: "Project deleted successfully" });
   } catch (error) {
     next(error);
   }

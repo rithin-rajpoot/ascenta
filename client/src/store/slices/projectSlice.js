@@ -58,6 +58,18 @@ export const updateProject = createAsyncThunk(
   }
 );
 
+export const deleteProject = createAsyncThunk(
+  "project/delete",
+  async (projectId, { rejectWithValue }) => {
+    try {
+      await projectService.deleteProject(projectId);
+      return projectId;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to delete project");
+    }
+  }
+);
+
 // --- Milestones ---
 
 export const getMilestones = createAsyncThunk(
@@ -172,6 +184,28 @@ const projectSlice = createSlice({
         state.currentProject = action.payload;
       })
       .addCase(updateProject.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      // Delete Project
+      .addCase(deleteProject.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(deleteProject.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.teamProjects = state.teamProjects.filter(
+          (p) => String(p._id) !== String(action.payload)
+        );
+        if (
+          state.currentProject &&
+          String(state.currentProject._id) === String(action.payload)
+        ) {
+          state.currentProject = null;
+          state.milestones = [];
+        }
+      })
+      .addCase(deleteProject.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })

@@ -3,6 +3,7 @@ import {
   createProjectController,
   getProjectController,
   updateProjectController,
+  deleteProjectController,
   getTeamProjectsController,
 } from "../controllers/projectController.js";
 import milestoneRoutes from "./milestoneRoutes.js";
@@ -24,5 +25,6 @@ router.use("/:projectId/milestones", milestoneRoutes);
 router.use("/:projectId/tasks", taskRoutes);
 router.get("/:id", getProjectController);
 router.put("/:id", authorize("student"), updateProjectController);
+router.delete("/:id", authorize("student"), deleteProjectController);
 
 export default router;

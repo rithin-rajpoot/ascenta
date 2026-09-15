@@ -27,10 +27,6 @@ function FacultyDashboardPage() {
     { icon: Star, label: "Feedback Given", value: stats?.totalFeedback ?? 0 },
   ];
 
-  useEffect(() => {
-    dispatch(getAssignedProjects());
-  }, [dispatch]);
-
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <div className="flex items-center gap-3">

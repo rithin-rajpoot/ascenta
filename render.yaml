@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: ascenta-ai-service
+    runtime: python
+    rootDir: ai-service
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.13
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: INTERNAL_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: https://ascenta-frontend.vercel.app,https://ascenta-backend-hixp.onrender.com

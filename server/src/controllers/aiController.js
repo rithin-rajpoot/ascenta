@@ -3,6 +3,10 @@ import axios from "axios";
 
 const isDev = config.nodeEnv !== "production";
 
+// AI generation (plus a possible Render free-tier cold start) can take a
+// while — 90s covers cold start + Gemini generation without hanging forever.
+const AI_PROXY_TIMEOUT_MS = 90 * 1000;
+
 export const proxyAiRequest = async (req, res, next, endpoint) => {
   try {
     if (isDev) {
@@ -17,6 +21,11 @@ export const proxyAiRequest = async (req, res, next, endpoint) => {
 
     const aiResponse = await axios.post(`${config.aiServiceUrl}/ai/${endpoint}`, req.body, {
       headers,
+      // Render free-tier services sleep after ~15 min idle, so the first AI
+      // call after idle pays a cold start (~30-60s) on top of Gemini
+      // generation time. Fail eventually instead of hanging forever — the AI
+      // service is warm by then, so a retry almost always succeeds.
+      timeout: AI_PROXY_TIMEOUT_MS,
     });
 
     if (isDev) {
@@ -25,6 +34,12 @@ export const proxyAiRequest = async (req, res, next, endpoint) => {
     res.status(200).json(aiResponse.data);
   } catch (error) {
     console.error(`[AI Proxy] Error:`, error.message);
+    if (error.code === "ECONNABORTED") {
+      return res.status(504).json({
+        success: false,
+        message: "The AI service is waking up or taking too long. Please try again in a moment.",
+      });
+    }
     if (error.response) {
       console.error(`[AI Proxy] Error response:`, error.response.status, error.response.data);
       res.status(error.response.status).json(error.response.data);

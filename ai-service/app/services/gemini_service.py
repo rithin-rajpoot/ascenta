@@ -16,7 +16,7 @@ class GeminiService:
         else:
             genai.configure(api_key=api_key)
         
-        self.model = genai.GenerativeModel("gemini-3.6-flash")
+        self.model = genai.GenerativeModel("gemini-3.5-flash")
 
     def _ensure_configured(self) -> None:
         """Fail clearly (and without leaking the key) when AI is not configured."""

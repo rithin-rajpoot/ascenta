@@ -92,19 +92,21 @@ The Gemini API key must remain inside the FastAPI service and must never be expo
 
 ## Overall Status
 
-**Phase 12 — Integration, Testing & Polish is complete. All MVP phases (0–8, 10–12) are done; Phase 9 — AI Documentation Generator remains SKIPPED (deferred by project decision).**
+**Phase 13 — Deployment & Final Release is complete. All phases (0–8, 10–13) are done; Phase 9 — AI Documentation Generator remains SKIPPED (deferred by project decision).**
 
-Regression suites are green (server 9/9, AI service 8/8), the frontend production build succeeds, and the app has global toasts, shared loading/empty/error states, accessible confirmation modals, auth client-side validation, a 404 page, and the reviewed security posture (expired-JWT rejection, role authorization, CORS allowlist, body cap, auth rate limiting, AI key server-side only).
+Live deployment: frontend on Vercel (`https://ascenta-frontend.vercel.app`), backend on Render free tier (`https://ascenta-backend-hixp.onrender.com`), AI service on Render free tier, MongoDB Atlas database.
+
+Regression suites are green (server 9/9, AI service 14/14 — 8 schema/health + 6 Gemini failover-chain tests), the frontend production build succeeds, and the app has global toasts, shared loading/empty/error states, accessible confirmation modals, auth client-side validation, a 404 page, manager-only project deletion with cascade cleanup, and the reviewed security posture (expired-JWT rejection, role authorization, CORS allowlist, body cap, auth rate limiting, AI key server-side only, 90s cold-start-aware AI proxy timeout).
 
 Students get a `/dashboard` page (nav link) with stat cards, per-project progress cards (milestone/task counts, pending & own tasks, next deadline), and recent faculty feedback. Faculty get the same stats treatment on their portal (progress bars, pending tasks, feedback counts per assigned project). Both are served by aggregation endpoints (`GET /api/dashboard/student`, `GET /api/faculty/dashboard`) computed from real database state with simple metrics only.
 
 ## Current Phase
 
-**Phase 12 — Integration, Testing & Polish (COMPLETED) · Phase 9 SKIPPED**
+**Phase 13 — Deployment & Final Release (COMPLETED) · Phase 9 SKIPPED**
 
 ## Current Task
 
-Phase 12 is complete and ready to commit/push. Remaining: Phase 13 — Deployment & Final Release.
+All phases complete (0–8, 10–13); Phase 9 remains SKIPPED/deferred. No pending implementation work.
 
 ---
 
@@ -777,6 +779,23 @@ Use this section for major completed changes.
 - Added (server tests): `tests/regression.test.js` (9 tests: `normalizeProjectData` arrays/whitespace/coercion, `generateInviteCode` format/uniqueness/charset) — runs with `node --test tests/`, zero new dependencies.
 - Accessibility: `prefers-reduced-motion` guard in `index.css` stops spinners/marquee/menu animations; form fields use `aria-invalid` + inline errors; alerts use `role="alert"`.
 - Verified: server 9/9 pass, AI service 8/8 pass, frontend production build succeeds, both backend apps import cleanly.
+### 2026-09-15 — Project Deletion (post-Phase-12 feature)
+
+- Added: `DELETE /api/projects/:id` (manager-only — project owner or team leader, 403 otherwise) with cascade cleanup of milestones, tasks, faculty reviews, and project notifications (`deleteProject` in `projectService`, `deleteProjectController`, route in `projectRoutes`).
+- Added (client): `deleteProject` API client + `projectSlice` thunk (clears `currentProject`/`milestones`, removes from `teamProjects`); Delete Project button with `ConfirmModal` on the overview header (manager-only); success toast + navigate to `/teams`.
+- Verified: server `node --check` clean, regression 9/9 pass, frontend production build succeeds.
+### 2026-09-17 — Phase 13 Deployment (AI service on Render, backend hardening)
+
+- Added: `render.yaml` Blueprint (rootDir `ai-service`, `pip install -r requirements.txt`, `uvicorn app.main:app --host 0.0.0.0 --port $PORT`, `healthCheckPath: /health`, `PYTHON_VERSION: 3.13.13`) + `ai-service/.python-version` (`3.13.13`). Manual Web Service flow uses the same values as dashboard env vars (`ALLOWED_ORIGINS` = Vercel frontend + Render backend, `GEMINI_API_KEY`, `INTERNAL_API_KEY` = backend `AI_SERVICE_KEY`).
+- Fixed: `server.js` binds `0.0.0.0` explicitly for the Render proxy; removed reliance on a manually-set `PORT` (Render injects `10000`, local dev stays `5000`).
+- Hardened: `aiController` proxy timeout 60s → **90s** (double cold start + Gemini generation); timeouts and HTML gateway 502/503/504s return friendly retry JSON; production logs print AI target host (never the key) and truncate gateway HTML to `<title>`.
+- Live: frontend `https://ascenta-frontend.vercel.app` (Vercel), backend `https://ascenta-backend-hixp.onrender.com` (Render free), AI service (Render free), MongoDB Atlas.
+### 2026-09-17 — Gemini Model Failover Chain
+
+- Added: `GEMINI_MODEL_CHAIN` in `ai-service` settings (default `gemini-3.5-flash,gemini-3.6-flash,gemini-3.7-flash,gemini-3.8-flash`, overridable via env var); `GeminiService` builds one model per entry (`self.model` kept as primary for back-compat).
+- Added: `_generate_with_failover` used by both `_generate_json` and `_generate_text` — quota/rate-limit errors (429 / `ResourceExhausted` / quota language) retry the same prompt on the next model with a 1s pause; non-quota errors fail fast with 500; all-exhausted returns honest HTTP 429.
+- Added: 6 failover tests (chain order, quota detection, retry-next-model, all-exhausted 429, fail-fast) — AI-service suite 8 → 14 tests, all passing.
+- Fixed: blueprint envelope unwrap (`res?.data?.data || res?.data`) so Generate Full Blueprint populates fields; removed stale `getAssignedProjects()` call crashing the faculty dashboard.
 ```
 
 Keep entries concise.

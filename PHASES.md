@@ -798,7 +798,8 @@ Connect all modules into one stable end-to-end product.
 ## Implementation Note
 
 - **Verification:** server regression suite (`node --test tests/`) 9/9 pass; AI-service suite
-  (`python -m unittest discover`) 8/8 pass; frontend production build succeeds; both backend
+  (`python -m unittest discover`) 14/14 pass (8 schema/health + 6 Gemini failover-chain
+  tests); frontend production build succeeds; both backend
   apps import cleanly. End-to-end flow verified: register → team → project → ideas/blueprint →
   milestones → Kanban → faculty review → assistant → notifications → dashboards.
 - **UI polish delivered:** `react-hot-toast` global toasts with friendly fallback messages
@@ -811,7 +812,8 @@ Connect all modules into one stable end-to-end product.
 - **Security review delivered:** JWT middleware now rejects expired tokens with 401
   (`TokenExpiredError` → "Session expired"), role authorization on every router, AI key
   server-side only (never exposed to browser), CORS allowlist from env, 100kb body cap,
-  30 req/15min rate limit on `/api/auth`, AI proxy timeout (60s) + no-secret prompts.
+  30 req/15min rate limit on `/api/auth`, AI proxy timeout (90s, raised from 60s for
+  Render free-tier cold starts) + no-secret prompts.
 - Phase 9 (Documentation Generator) stays **SKIPPED/deferred** — references below to
   "Generate Documentation" in the end-to-end flow are aspirational, not implemented.
 
@@ -891,40 +893,69 @@ Test:
 
 # Phase 13 — Deployment & Final Release
 
+**Status: COMPLETED**
+
 ## Objective
 
 Deploy the MVP and prepare it for demonstration and paper-related evaluation.
 
 ## Deployment
 
-### Frontend
+Live deployment (all three tiers):
 
-Vercel
+| Tier | Host | URL |
+|---|---|---|
+| Frontend | Vercel | `https://ascenta-frontend.vercel.app` |
+| Backend | Render (free tier) | `https://ascenta-backend-hixp.onrender.com` |
+| AI Service | Render (free tier, manual Web Service) | `https://<ai-service>.onrender.com` |
+| Database | MongoDB Atlas | — |
 
-### Backend
+## Implementation Note
 
-Render
-
-### AI Service
-
-Render
-
-### Database
-
-MongoDB Atlas
+- **AI-service deploy config:** `render.yaml` Blueprint (rootDir `ai-service`, build
+  `pip install -r requirements.txt`, start `uvicorn app.main:app --host 0.0.0.0 --port $PORT`,
+  `healthCheckPath: /health`, `PYTHON_VERSION: 3.13.13`) plus `ai-service/.python-version`
+  (`3.13.13`, matching the tested local venv). For the manual Web Service flow `render.yaml`
+  is ignored, so the same values (`ALLOWED_ORIGINS`, `PYTHON_VERSION=3.13.13`,
+  `GEMINI_API_KEY`, `INTERNAL_API_KEY`) are set as dashboard env vars.
+- **Backend Render hardening:** `server.js` binds `0.0.0.0` explicitly (Render routes to the
+  injected `$PORT`; no manually-set `PORT` in the dashboard so `10000` takes effect, local
+  dev unchanged at `5000`).
+- **AI proxy vs. cold starts:** proxy timeout raised to **90s** (was 60s) to cover double
+  cold start (backend + AI service waking) plus Gemini generation; timeouts and HTML
+  gateway 502/503/504s both return the friendly retry JSON
+  (`"The AI service is waking up or taking too long..."`) instead of leaking gateway pages.
+  Production logs print the AI target host (never the key) and truncate gateway HTML to its
+  `<title>` for fast diagnosis.
+- **Gemini model failover chain:** `gemini-3.5-flash → 3.6 → 3.7 → 3.8-flash` (configurable
+  via `GEMINI_MODEL_CHAIN` env var). Quota/rate-limit failures (429 / `ResourceExhausted`)
+  automatically retry the same prompt on the next model; non-quota errors fail fast. All
+  models exhausted → HTTP 429 with an honest retry-later message (surfaced by the
+  backend proxy + frontend toasts). Applies to all five AI endpoints. AI-service suite
+  grew 8 → **14 tests** (chain order, quota detection, failover, exhaustion, fail-fast).
+- **Project deletion (post-Phase-12 feature):** `DELETE /api/projects/:id`, manager-only
+  (owner or team leader → 403 otherwise), cascade-deletes milestones, tasks, faculty
+  reviews, and project notifications. Frontend: Delete Project button + `ConfirmModal` on
+  the overview header, toast + navigate to `/teams` on success.
+- **Blueprint envelope fix:** `ProjectBlueprintPage` unwraps `res?.data?.data || res?.data`
+  so the full blueprint populates fields regardless of response nesting.
+- **Faculty dashboard fix:** removed stale `getAssignedProjects()` call that crashed the
+  page with `ReferenceError`.
+- **Verification at completion:** server regression 9/9 pass, AI service 14/14 pass,
+  frontend production build succeeds.
 
 ## Tasks
 
-- Configure production environment variables.
-- Configure CORS.
-- Deploy frontend.
-- Deploy backend.
-- Deploy FastAPI AI service.
-- Connect production database.
-- Test all production APIs.
-- Test AI functionality in production.
-- Verify authentication.
-- Verify responsive UI.
+- [x] Configure production environment variables.
+- [x] Configure CORS.
+- [x] Deploy frontend.
+- [x] Deploy backend.
+- [x] Deploy FastAPI AI service.
+- [x] Connect production database.
+- [x] Test all production APIs.
+- [x] Test AI functionality in production.
+- [x] Verify authentication.
+- [x] Verify responsive UI.
 
 ---
 

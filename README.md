@@ -203,8 +203,18 @@ Health check: `GET http://localhost:8000/health`
 - Stable end-to-end product: register → team → project → ideas/blueprint → milestones → Kanban → faculty review → assistant → notifications → dashboards
 - Global toast notifications with friendly error messages; `PageLoader`, `EmptyState`, `ErrorBoundary`, accessible `ConfirmModal`, and a 404 page
 - Auth client-side validation with inline messages; API safety net (session-expiry re-login, throttled offline toast); `prefers-reduced-motion` support
-- Security review: expired-JWT rejection, role authorization on all routers, server-side AI key, CORS allowlist, 100kb body cap, auth rate limiting, AI proxy timeout
-- Regression suites green: server 9/9 (`node --test tests/`), AI service 8/8 (`python -m unittest discover`), frontend production build succeeds
+- Security review: expired-JWT rejection, role authorization on all routers, server-side AI key, CORS allowlist, 100kb body cap, auth rate limiting, AI proxy timeout (90s, cold-start aware)
+- Regression suites green: server 9/9 (`node --test tests/`), AI service 14/14 (`python -m unittest discover`, incl. 6 Gemini failover-chain tests), frontend production build succeeds
+
+### Project Deletion (post-Phase-12)
+- Manager-only `DELETE /api/projects/:id` (project owner or team leader; 403 otherwise) with cascade cleanup of milestones, tasks, faculty reviews, and project notifications
+- Delete Project button with confirmation modal on the project overview; success toast + redirect to `/teams`
+
+### Deployment & Final Release (Phase 13)
+- Live deployment: frontend on Vercel (`https://ascenta-frontend.vercel.app`), backend + AI service on Render free tier, MongoDB Atlas database
+- AI-service deploy config: `render.yaml` Blueprint + `ai-service/.python-version` (Python 3.13.13); manual Web Service uses the same values as dashboard env vars (`ALLOWED_ORIGINS`, `PYTHON_VERSION`, `GEMINI_API_KEY`, `INTERNAL_API_KEY`)
+- Backend binds `0.0.0.0` for the Render proxy; AI proxy returns friendly retry JSON on timeouts and HTML gateway 502/503/504s, with host-only production logging
+- Gemini model failover chain (`gemini-3.5-flash → 3.6 → 3.7 → 3.8-flash`, via `GEMINI_MODEL_CHAIN`): automatic retry on quota/rate-limit errors, HTTP 429 when all models are exhausted
 
 ### Skipped
 - **Phase 9 — AI Documentation Generator:** deferred by project decision (see `PHASES.md`)
@@ -224,5 +234,6 @@ Health check: `GET http://localhost:8000/health`
 - **Phase 10 — Notifications:** Completed
 - **Phase 11 — Dashboards & Progress Overview:** Completed
 - **Phase 12 — Integration, Testing & Polish:** Completed
+- **Phase 13 — Deployment & Final Release:** Completed (live: Vercel frontend, Render backend + AI service, Atlas DB)
 
 See `PHASES.md` for the full development roadmap.

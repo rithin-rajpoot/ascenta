@@ -111,7 +111,9 @@ function ProjectBlueprintPage() {
           return [];
         };
 
-        const bp = res?.data || {};
+        // generateProjectBlueprint returns the axios body { success, data } —
+        // unwrap one level to reach the actual blueprint fields.
+        const bp = res?.data?.data || res?.data || {};
 
         return {
           ...prev,

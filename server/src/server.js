@@ -6,7 +6,10 @@ const startServer = async () => {
   validateEnv();
   await connectDB();
 
-  app.listen(config.port, () => {
+  // Bind 0.0.0.0 explicitly: hosting proxies (Render) route to $PORT, and the
+  // default Express host can leave the service unreachable from the proxy.
+  // Local dev is unchanged (PORT unset -> 5000).
+  app.listen(config.port, "0.0.0.0", () => {
     console.log(`🚀 Ascenta backend running at http://localhost:${config.port}`);
     console.log(`   Health check: http://localhost:${config.port}/api/health`);
     console.log(`   Environment: ${config.nodeEnv}`);

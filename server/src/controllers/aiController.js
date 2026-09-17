@@ -7,10 +7,44 @@ const isDev = config.nodeEnv !== "production";
 // while — 90s covers cold start + Gemini generation without hanging forever.
 const AI_PROXY_TIMEOUT_MS = 90 * 1000;
 
+// Host portion of the AI URL for safe production logging (no secrets).
+const aiServiceHost = () => {
+  try {
+    return new URL(config.aiServiceUrl).host;
+  } catch {
+    return config.aiServiceUrl;
+  }
+};
+
+// Render gateway failures come back as full HTML pages — keep just the
+// <title> (or a short slice) so logs stay readable.
+const summarizeProxyBody = (body) => {
+  const text = typeof body === "string" ? body : JSON.stringify(body ?? "");
+  const title = /<title>([^<]*)<\/title>/i.exec(text)?.[1]?.trim();
+  if (title) return `<title>${title}</title>`;
+  return text.slice(0, 300);
+};
+
+// True when the failure came from a gateway/proxy (HTML page), not from the
+// AI service itself (which always answers JSON, even on errors).
+const isGatewayHtml = (response) => {
+  const contentType = response.headers?.["content-type"] || "";
+  if (contentType.includes("text/html")) return true;
+  return (
+    [502, 503, 504].includes(response.status) &&
+    typeof response.data === "string" &&
+    response.data.includes("<!DOCTYPE html>")
+  );
+};
+
 export const proxyAiRequest = async (req, res, next, endpoint) => {
   try {
     if (isDev) {
       console.log(`[AI Proxy] Calling: ${config.aiServiceUrl}/ai/${endpoint}`);
+    } else {
+      // Production: log the target host (never the key) so a misconfigured
+      // AI_SERVICE_URL is visible in Render logs instead of a bare 502.
+      console.log(`[AI Proxy] Calling AI host: ${aiServiceHost()}/ai/${endpoint}`);
     }
 
     const headers = { "Content-Type": "application/json" };
@@ -41,7 +75,23 @@ export const proxyAiRequest = async (req, res, next, endpoint) => {
       });
     }
     if (error.response) {
-      console.error(`[AI Proxy] Error response:`, error.response.status, error.response.data);
+      // Truncate HTML gateway pages (e.g. Render 502) to the <title> so the
+      // real cause is visible in logs without dumping a whole page.
+      console.error(
+        `[AI Proxy] Error response:`,
+        error.response.status,
+        summarizeProxyBody(error.response.data)
+      );
+      // The AI service itself always answers JSON — an HTML 502/503/504 means a
+      // gateway/proxy in front of it failed (common during free-tier cold
+      // starts). Answer with the friendly retry message instead of leaking the
+      // gateway page to the frontend.
+      if (isGatewayHtml(error.response)) {
+        return res.status(504).json({
+          success: false,
+          message: "The AI service is waking up or taking too long. Please try again in a moment.",
+        });
+      }
       res.status(error.response.status).json(error.response.data);
     } else {
       res.status(500).json({ success: false, message: "Failed to connect to AI service" });

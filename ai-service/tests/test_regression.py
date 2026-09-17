@@ -20,8 +20,85 @@ from pydantic import ValidationError
 
 from app.main import app
 from app.schemas import ai as ai_schemas
+from app.config.settings import GEMINI_MODEL_CHAIN
+from app.services.gemini_service import _is_quota_error, gemini_service
 
 client = TestClient(app)
+
+
+class ModelFailoverTest(unittest.TestCase):
+    def test_chain_has_expected_models_in_order(self):
+        self.assertEqual(
+            GEMINI_MODEL_CHAIN,
+            ["gemini-3.5-flash", "gemini-3.6-flash", "gemini-3.7-flash", "gemini-3.8-flash"],
+        )
+
+    def test_service_builds_one_model_per_chain_entry(self):
+        self.assertEqual(len(gemini_service.models), len(GEMINI_MODEL_CHAIN))
+
+    def test_quota_errors_detected(self):
+        self.assertTrue(_is_quota_error(Exception("429 You exceeded your current quota")))
+        self.assertTrue(_is_quota_error(Exception("Quota exceeded for quota metric")))
+        self.assertTrue(_is_quota_error(Exception("ResourceExhausted: rate limit hit")))
+        self.assertFalse(_is_quota_error(Exception("Invalid API key")))
+        self.assertFalse(_is_quota_error(Exception("model not found")))
+
+    def test_failover_retries_next_model_on_quota_error(self):
+        calls = []
+
+        def flaky(model):
+            calls.append(model._model_name)
+            if len(calls) < 3:
+                raise Exception("429 You exceeded your current quota")
+            return {"ok": True}
+
+        class FakeModel:
+            def __init__(self, name):
+                self._model_name = name
+
+        names = ["m1", "m2", "m3"]
+        gemini_service.models = [FakeModel(n) for n in names]
+        try:
+            from unittest.mock import patch
+
+            with patch("app.services.gemini_service.GEMINI_MODEL_CHAIN", names):
+                with patch("app.services.gemini_service.time.sleep", return_value=None):
+                    result = gemini_service._generate_with_failover(flaky, description="test")
+        finally:
+            from app.services import gemini_service as gs_module
+
+            gemini_service.models = [
+                gs_module.genai.GenerativeModel(name) for name in GEMINI_MODEL_CHAIN
+            ]
+        self.assertEqual(result, {"ok": True})
+        self.assertEqual(calls, names)
+
+    def test_all_models_exhausted_returns_429(self):
+        from fastapi import HTTPException
+
+        def always_quota(model):
+            raise Exception("429 You exceeded your current quota")
+
+        from unittest.mock import patch
+
+        with patch("app.services.gemini_service.time.sleep", return_value=None):
+            with self.assertRaises(HTTPException) as ctx:
+                gemini_service._generate_with_failover(always_quota, description="test")
+        self.assertEqual(ctx.exception.status_code, 429)
+
+    def test_non_quota_error_fails_fast_without_retry(self):
+        from fastapi import HTTPException
+
+        calls = []
+
+        def bad_request(model):
+            calls.append(model)
+            raise Exception("Invalid API key")
+
+        with self.assertRaises(HTTPException) as ctx:
+            gemini_service._generate_with_failover(bad_request, description="test")
+        self.assertEqual(ctx.exception.status_code, 500)
+        self.assertEqual(len(calls), 1)
 
 
 class HealthEndpointTest(unittest.TestCase):

@@ -1,11 +1,27 @@
 import os
 import json
+import time
 import google.generativeai as genai
 from fastapi import HTTPException
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from google.api_core.exceptions import ResourceExhausted
+from app.config.settings import GEMINI_MODEL_CHAIN
 
 load_dotenv()
+
+
+def _is_quota_error(error: Exception) -> bool:
+    """True when the failure is a quota/rate-limit error worth retrying on the next model."""
+    if isinstance(error, ResourceExhausted):
+        return True
+    message = str(error)
+    code = getattr(error, "code", None) or getattr(getattr(error, "response", None), "status_code", None)
+    if code == 429:
+        return True
+    lowered = message.lower()
+    return "429" in message or "quota" in lowered or "rate limit" in lowered or "resourceexhausted" in lowered.replace(" ", "").replace("_", "")
+
 
 class GeminiService:
     def __init__(self):
@@ -15,8 +31,12 @@ class GeminiService:
             print("WARNING: GEMINI_API_KEY not set")
         else:
             genai.configure(api_key=api_key)
-        
-        self.model = genai.GenerativeModel("gemini-3.5-flash")
+
+        self.models = [genai.GenerativeModel(name) for name in GEMINI_MODEL_CHAIN]
+        # Back-compat: some code/tests may reference `.model` (the primary).
+        self.model = self.models[0]
+        print(f"Gemini model chain: {' -> '.join(GEMINI_MODEL_CHAIN)}")
+
 
     def _ensure_configured(self) -> None:
         """Fail clearly (and without leaking the key) when AI is not configured."""
@@ -28,8 +48,9 @@ class GeminiService:
 
     def _generate_json(self, prompt: str, schema: BaseModel) -> dict:
         self._ensure_configured()
-        try:
-            response = self.model.generate_content(
+
+        def call(model):
+            response = model.generate_content(
                 prompt,
                 generation_config=genai.GenerationConfig(
                     response_mime_type="application/json",
@@ -37,9 +58,8 @@ class GeminiService:
                 ),
             )
             return json.loads(response.text)
-        except Exception as e:
-            print(f"Gemini API Error: {str(e)}")
-            raise HTTPException(status_code=500, detail="Failed to generate content from AI")
+
+        return self._generate_with_failover(call, description="JSON generation")
 
     def generate_ideas(self, data: dict) -> dict:
         from app.schemas.ai import ProjectIdeasResponse
@@ -106,12 +126,37 @@ class GeminiService:
     def _generate_text(self, prompt: str) -> str:
         """Free-text generation (no JSON schema) for conversational answers."""
         self._ensure_configured()
-        try:
-            response = self.model.generate_content(prompt)
-            return response.text
-        except Exception as e:
-            print(f"Gemini API Error: {str(e)}")
-            raise HTTPException(status_code=500, detail="Failed to generate content from AI")
+        return self._generate_with_failover(
+            lambda model: model.generate_content(prompt).text,
+            description="text generation",
+        )
+
+    def _generate_with_failover(self, call, description: str):
+        """Run `call(model)` across the model chain, failing over on quota errors.
+
+        Each model gets one attempt. Quota/rate-limit failures (429 /
+        ResourceExhausted) move to the next model with a short pause; any other
+        error fails fast since retrying a different model won't help.
+        """
+        last_error = None
+        for index, (model_name, model) in enumerate(zip(GEMINI_MODEL_CHAIN, self.models)):
+            try:
+                return call(model)
+            except HTTPException:
+                raise
+            except Exception as e:
+                last_error = e
+                if not _is_quota_error(e):
+                    print(f"Gemini API Error ({model_name}): {str(e)}")
+                    raise HTTPException(status_code=500, detail="Failed to generate content from AI")
+                print(f"Gemini quota exceeded on {model_name} ({index + 1}/{len(self.models)}), failing over...: {str(e)[:200]}")
+                if index < len(self.models) - 1:
+                    time.sleep(1)
+        print(f"Gemini API Error: all {len(self.models)} models exhausted quota: {str(last_error)[:300]}")
+        raise HTTPException(
+            status_code=429,
+            detail="AI quota exceeded on all available models. Please try again in a little while.",
+        )
 
     def generate_assistant(self, data: dict) -> dict:
         from app.schemas.ai import AssistantRequest
